@@ -58,8 +58,8 @@ export const auth = (...requiredRoles: Role[]) => {
             throw new Error("User does not exist");
         }
 
-        if (user.activeStatus === "BLOCKED") {
-            throw new Error("You are blocked! Please contact support");
+        if (user.status !== "ACTIVE") {
+            throw new Error("You are suspended! Please contact support");
         }
 
         req.user = {
