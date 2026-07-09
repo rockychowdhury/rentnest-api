@@ -5,8 +5,8 @@ import cookieParser from "cookie-parser";
 import status from "http-status";
 import { userRoute } from "./modules/user/user.route";
 import { authRoutes } from "./modules/auth/auth.route";
-import { globalErrorHandler } from "./middlewares/globalErrorHandler";
-import { notFound } from "./middlewares/notFound";
+import { globalErrorHandler } from "./middleware/globalErrorHandler";
+import { notFound } from "./middleware/notFound";
 
 
 const app: Application = express();
