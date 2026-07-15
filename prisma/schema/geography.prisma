@@ -1,0 +1,63 @@
+model Division {
+  id     Int     @id @default(autoincrement())
+  name   String  @db.VarChar(255)
+  bnName String? @map("bn_name") @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  districts District[]
+
+  @@map("divisions")
+}
+
+model District {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(255)
+  bnName     String?   @map("bn_name") @db.VarChar(255)
+  divisionId Int       @map("division_id")
+  division   Division  @relation(fields: [divisionId], references: [id])
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  upazilas   Upazila[]
+
+  @@index([divisionId])
+  @@index([name])
+  @@map("districts")
+}
+
+model Upazila {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(255)
+  bn_name    String?  @map("bn_name") @db.VarChar(255)
+  districtId Int      @map("division_id")
+  district   District @relation(fields: [districtId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  addresses Address[]
+
+  @@index([districtId])
+  @@index([name])
+  @@map("upazilas")
+}
+
+model Address {
+  id            Int      @id @default(autoincrement())
+  buildingNo    String   @map("building_no") @db.VarChar(255)
+  streetAddress String   @map("street_address") @db.VarChar(255)
+  addressLine2  String?  @map("address_line2")
+  landmark      String?  @db.VarChar(255)
+  postalCode    String   @map("postal_code") @db.VarChar(20)
+  upazilaId     Int      @map("upazila_id")
+  upazila       Upazila  @relation(fields: [upazilaId], references: [id])
+  latitude      Decimal? @db.Decimal(11, 8)
+  longitude     Decimal? @db.Decimal(11, 8)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  property Property?
+
+  @@index([upazilaId])
+  @@map("addresses")
+}

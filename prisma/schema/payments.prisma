@@ -1,0 +1,22 @@
+model Payment {
+  id            String        @id @default(uuid()) @db.Uuid
+  payerId       String        @map("payer_id") @db.Uuid
+  leaseId       String?       @map("lease_id") @db.Uuid
+  status        PaymentStatus @default(PENDING)
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("BDT") @db.VarChar(3)
+  paymentType   PaymentType   @map("payment_type")
+  paymentMethod PaymentMethod @map("payment_method")
+  transactionId String        @unique @map("transaction_id") @db.VarChar(255)
+  gatewayRef    String?       @map("gateway_ref") @db.VarChar(255)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  payer User   @relation(fields: [payerId], references: [id])
+  lease Lease? @relation(fields: [leaseId], references: [id], onDelete: SetNull)
+
+  @@index([payerId])
+  @@index([leaseId])
+  @@index([status])
+  @@map("payments")
+}

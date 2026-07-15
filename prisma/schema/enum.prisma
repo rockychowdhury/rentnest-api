@@ -1,17 +1,73 @@
 enum UserStatus {
-    ACTIVE
-    SUSPENDED
-    BANNED
+  ACTIVE
+  SUSPENDED
+  BANNED
 }
 
-enum Role {
-    TENANT
-    LANDLORD
-    ADMIN
+enum UserRole {
+  TENANT
+  LANDLORD
+  ADMIN
 }
 
 enum Gender {
-    MALE
-    FEMALE
-    OTHER
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum PropertyStatus {
+  DRAFT
+  PUBLISHED
+  INACTIVE
+}
+
+enum UnitStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+}
+
+enum RentType {
+  HOURLY
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum RentalRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  EXPIRED
+}
+
+enum LeaseStatus {
+  ACTIVE
+  COMPLETED
+  TERMINATED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentType {
+  BOOKING_FEE
+  SECURITY_DEPOSIT
+  MONTHLY_RENT
+}
+
+enum PaymentMethod {
+  CARD
+  BKASH
+  NAGAD
+  ROCKET
+  NET_BANKING
+  CASH
 }

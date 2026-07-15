@@ -1,0 +1,19 @@
+model Review {
+    id               String   @id @default(uuid()) @db.Uuid
+    propertyId       String   @map("property_id") @db.Uuid
+    leaseId          String?  @unique @map("lease_id") @db.Uuid
+    tenantId         String   @map("tenant_id") @db.Uuid
+    rating           Int      @db.SmallInt
+    comment          String?
+    landlordResponse String?  @map("landlord_response")
+    createdAt        DateTime @default(now()) @map("created_at")
+    updatedAt        DateTime @updatedAt @map("updated_at")
+
+    property Property @relation(fields: [propertyId], references: [id])
+    tenant   User     @relation(fields: [tenantId], references: [id])
+    lease    Lease?   @relation(fields: [leaseId], references: [id], onDelete: SetNull)
+
+    @@index([propertyId])
+    @@index([tenantId])
+    @@map("reviews")
+}

@@ -1,15 +1,39 @@
 model User {
-    id        String     @id @default(ulid())
-    phone      String     @db.VarChar(15)
-    email     String     @unique
-    password_hashed  String
-    status    UserStatus @default(ACTIVE)
-    role      Role       @default(TENANT)
-    created_at DateTime   @default(now())
-    updated_at DateTime   @updatedAt
-    deleted_at DateTime?
-    profile   Profile?
-    
-    @@index([email])
-    @@map("users")
+  id             String     @id @default(uuid()) @db.Uuid
+  email          String     @unique @db.VarChar(255)
+  phone          String     @unique @db.VarChar(255)
+  passwordHashed String     @map("password_hashed") @db.VarChar(255)
+  role           UserRole   @default(TENANT)
+  status         UserStatus @default(ACTIVE)
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  profile        Profile?
+  properties     Property[]      @relation("LandlordProperties")
+  rentalRequests RentalRequest[]
+  leases         Lease[]
+  payments       Payment[]
+  reviews        Review[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Profile {
+  id         String  @id @default(uuid()) @db.Uuid
+  fullName   String  @map("full_name") @db.VarChar(255)
+  avatarUrl  String? @map("avatar_url") @db.VarChar(255)
+  bio        String? @db.VarChar(500)
+  gender     Gender?
+  occupation String? @db.VarChar(255)
+
+  userId String @unique @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("profiles")
 }

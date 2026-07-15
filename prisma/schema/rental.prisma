@@ -1,0 +1,56 @@
+model RentalRequest {
+  id               String              @id @default(uuid()) @db.Uuid
+  tenantId         String              @map("tenant_id") @db.Uuid
+  propertyUnitId   String              @map("property_unit_id") @db.Uuid
+  pricingId        String              @map("pricing_id") @db.Uuid
+  /// snapshot of pricing.rent_amount at the time of the request
+  agreedAmount     Decimal             @map("agreed_amount") @db.Decimal(10, 2)
+  /// snapshot of pricing.rent_type at the time of the request
+  rentType         RentType            @map("rent_type")
+  moveInDate       DateTime            @map("move_in_date") @db.Date
+  duration         Int?                @db.SmallInt
+  message          String?
+  status           RentalRequestStatus @default(PENDING)
+  /// used for rejection message
+  landlordResponse String?             @map("landlord_response")
+  respondedAt      DateTime?           @map("responded_at")
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  tenant       User         @relation(fields: [tenantId], references: [id])
+  propertyUnit PropertyUnit @relation(fields: [propertyUnitId], references: [id])
+  pricing      Pricing      @relation(fields: [pricingId], references: [id])
+  lease        Lease?
+
+  @@index([tenantId])
+  @@index([propertyUnitId])
+  @@index([status])
+  @@map("rental_requests")
+}
+
+model Lease {
+  id              String      @id @default(uuid()) @db.Uuid
+  propertyUnitId  String      @map("property_unit_id") @db.Uuid
+  tenantId        String      @map("tenant_id") @db.Uuid
+  rentalRequestId String      @unique @map("rental_request_id") @db.Uuid
+  /// snapshot, decoupled from mutable Pricing rows
+  rentType        RentType    @map("rent_type")
+  /// snapshot, decoupled from mutable Pricing rows
+  agreedAmount    Decimal     @map("agreed_amount") @db.Decimal(10, 2)
+  startDate       DateTime    @map("start_date") @db.Date
+  endDate         DateTime?   @map("end_date") @db.Date
+  status          LeaseStatus @default(ACTIVE)
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  propertyUnit  PropertyUnit  @relation(fields: [propertyUnitId], references: [id])
+  tenant        User          @relation(fields: [tenantId], references: [id])
+  rentalRequest RentalRequest @relation(fields: [rentalRequestId], references: [id])
+  payments      Payment[]
+  review        Review?
+
+  @@index([propertyUnitId])
+  @@index([tenantId])
+  @@index([status])
+  @@map("leases")
+}

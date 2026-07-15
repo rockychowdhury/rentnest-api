@@ -1,0 +1,118 @@
+model Category {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(255)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  properties Property[]
+
+  @@map("categories")
+}
+
+model Property {
+  id          String         @id @default(uuid()) @db.Uuid
+  landlordId  String         @map("landlord_id") @db.Uuid
+  categoryId  String         @map("category_id") @db.Uuid
+  addressId   Int            @unique @map("address_id")
+  title       String         @db.VarChar(255)
+  description String
+  status      PropertyStatus @default(DRAFT)
+  isFeatured  Boolean        @default(false) @map("is_featured")
+  totalUnits  Int            @default(1) @map("total_units") @db.SmallInt
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  deletedAt   DateTime?      @map("deleted_at")
+
+  landlord  User              @relation("LandlordProperties", fields: [landlordId], references: [id])
+  category  Category          @relation(fields: [categoryId], references: [id])
+  address   Address           @relation(fields: [addressId], references: [id])
+  units     PropertyUnit[]
+  images    PropertyImage[]
+  amenities PropertyAmenity[]
+  reviews   Review[]
+
+  @@index([landlordId])
+  @@index([categoryId])
+  @@index([status])
+  @@map("properties")
+}
+
+model PropertyUnit {
+  id          String     @id @default(uuid()) @db.Uuid
+  propertyId  String     @map("property_id") @db.Uuid
+  unitLabel   String     @map("unit_label") @db.VarChar(255)
+  status      UnitStatus @default(AVAILABLE)
+  sizeSqft    Int?       @map("size_sqft")
+  bedrooms    Int        @default(0) @db.SmallInt
+  bathrooms   Int        @default(0) @db.SmallInt
+  floor       Int?       @db.SmallInt
+  description String?
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  property       Property        @relation(fields: [propertyId], references: [id])
+  pricing        Pricing[]
+  rentalRequests RentalRequest[]
+  leases         Lease[]
+
+  @@index([propertyId])
+  @@index([status])
+  @@map("property_units")
+}
+
+model PropertyImage {
+  id         String   @id @default(uuid()) @db.Uuid
+  propertyId String   @map("property_id") @db.Uuid
+  url        String   @db.VarChar(255)
+  caption    String?  @db.VarChar(255)
+  isCover    Boolean  @default(false) @map("is_cover")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@map("property_images")
+}
+
+model Amenity {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(255)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  properties PropertyAmenity[]
+
+  @@map("amenities")
+}
+
+model PropertyAmenity {
+  propertyId String @map("property_id") @db.Uuid
+  amenityId  String @map("amenity_id") @db.Uuid
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  amenity  Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, amenityId])
+  @@index([amenityId])
+  @@map("property_amenities")
+}
+
+model Pricing {
+  id              String   @id @default(uuid()) @db.Uuid
+  propertyUnitId  String   @map("property_unit_id") @db.Uuid
+  rentType        RentType @map("rent_type")
+  rentAmount      Decimal  @map("rent_amount") @db.Decimal(10, 2)
+  securityDeposit Decimal? @default(0) @map("security_deposit") @db.Decimal(10, 2)
+  currency        String   @default("BDT") @db.VarChar(3)
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  propertyUnit   PropertyUnit    @relation(fields: [propertyUnitId], references: [id])
+  rentalRequests RentalRequest[]
+
+  @@unique([propertyUnitId, rentType])
+  @@index([propertyUnitId])
+  @@map("pricing")
+}
