@@ -11,7 +11,6 @@ const createUser = catchAsync(
     }
 )
 
-
 const getAllUsers = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
 
@@ -28,12 +27,17 @@ const updateUserStatusById = catchAsync(
 
     }
 )
-const softDeleteUserById = catchAsync(
+const deleteMyAccount = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
 
     }
 )
-const updateMyProfile = catchAsync(
+const restoreUserAccount = catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+
+    }
+)
+const updateMyAccount = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
 
     }
@@ -49,7 +53,8 @@ export const userController = {
     getMyProfile,
     getUserById,
     updateUserStatusById,
-    updateMyProfile,
-    softDeleteUserById,
-    createUser
+    updateMyAccount,
+    deleteMyAccount,
+    createUser,
+    restoreUserAccount
 }

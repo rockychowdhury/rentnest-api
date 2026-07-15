@@ -19,11 +19,15 @@ const updateUserStatusById = () =>{
 
 }
 
-const softDeleteUserById = () => {
+const deleteMyAccount = () => {
 
 }
 
-const updateMyProfile = () =>{
+const restoreUserAccount = () =>{
+
+}
+
+const updateMyAccount = () =>{
 
 }
 
@@ -36,7 +40,8 @@ export const userService = {
     getMyProfile,
     getUserById,
     updateUserStatusById,
-    updateMyProfile,
-    softDeleteUserById,
-    createUser
+    updateMyAccount,
+    deleteMyAccount,
+    createUser,
+    restoreUserAccount
 }
