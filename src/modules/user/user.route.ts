@@ -14,7 +14,7 @@ router.delete("/me", auth(UserRole.ADMIN, UserRole.LANDLORD, UserRole.TENANT), u
 
 router.get("/:userId", auth(UserRole.ADMIN), userController.getUserById);
 router.patch("/:userId/status", auth(UserRole.ADMIN), userController.updateUserStatusById);
-router.post("/:userId/restore", auth(UserRole.ADMIN, UserRole.LANDLORD, UserRole.TENANT), userController.restoreUserAccount)
+router.post("/:userId/restore", userController.restoreUserAccount)
 
 export const userRoute = router;
 
