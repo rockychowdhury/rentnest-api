@@ -97,7 +97,7 @@ const updateMyAccount = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
         const payload = req.body;
         const userId = req.user?.id;
-        const user = userService.updateMyAccount(payload, userId as string);
+        const user = await userService.updateMyAccount(payload, userId as string);
         sendResponse(res, {
             success: true,
             statusCode: status.OK,
@@ -111,13 +111,13 @@ const updateMyAccount = catchAsync(
 const getMyProfile = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
         const userId = req.user?.id;
-        const profile = userService.getMyProfile(userId as string);
+        const profile =await userService.getMyProfile(userId as string);
         sendResponse(
             res,
             {
                 success: true,
                 statusCode: status.OK,
-                message: "Profile feteched success",
+                message: "Profile fetched success",
                 data: profile
             }
         )

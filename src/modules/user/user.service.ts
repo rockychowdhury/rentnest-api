@@ -1,11 +1,11 @@
 import bcrypt from "bcryptjs";
-import { UserStatus } from "../../../generated/prisma/enums"
+import { UserRole, UserStatus } from "../../../generated/prisma/enums"
 import { prisma } from "../../lib/prisma";
 import { IUpdateUserPayload, IUserRegisterPayload } from "./user.interface"
 import config from "../../config";
 
 const createUser = async (payload: IUserRegisterPayload) => {
-    const { email, fullName, phone, password } = payload;
+    const { email, fullName, phone, password, role } = payload;
 
     const isUserExist = await prisma.user.findUnique({
         where: {
@@ -16,7 +16,9 @@ const createUser = async (payload: IUserRegisterPayload) => {
     if (isUserExist) {
         throw new Error("User with this email already exist");
     }
-
+    if(role === UserRole.ADMIN){
+        throw new Error("Bad Request. Client Error")
+    }
     const hashedPassword = await bcrypt.hash(password, Number(config.bcrypt_salt_rounds));
 
     const response = await prisma.user.create(
@@ -25,6 +27,7 @@ const createUser = async (payload: IUserRegisterPayload) => {
                 email,
                 phone,
                 passwordHashed: hashedPassword,
+                role,
                 profile: {
                     create: {
                         fullName
@@ -92,7 +95,7 @@ const deleteMyAccount = async (userId: string) => {
         {
             where: { id: userId },
             data: {
-                deletedAt: Date.now().toString(),
+                deletedAt: new Date(),
                 status: UserStatus.SUSPENDED
             },
             omit: {
@@ -104,10 +107,11 @@ const deleteMyAccount = async (userId: string) => {
     return user;
 }
 
-const restoreUserAccount = async (payload: { email: string }) => {
+const restoreUserAccount = async (email:{email:string} ) => {
+    // console.log(email);
     const user = await prisma.user.update(
         {
-            where: { email: payload.email },
+            where: email,
             data: {
                 deletedAt: null,
                 status: UserStatus.ACTIVE

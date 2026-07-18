@@ -11,10 +11,10 @@ router.get("/", auth(UserRole.ADMIN), userController.getAllUsers);
 router.get("/me", auth(UserRole.ADMIN, UserRole.LANDLORD, UserRole.TENANT), userController.getMyProfile);
 router.patch("/me", auth(UserRole.ADMIN, UserRole.LANDLORD, UserRole.TENANT), userController.updateMyAccount);
 router.delete("/me", auth(UserRole.ADMIN, UserRole.LANDLORD, UserRole.TENANT), userController.deleteMyAccount);
+router.post("/restore", userController.restoreUserAccount)
 
 router.get("/:userId", auth(UserRole.ADMIN), userController.getUserById);
 router.patch("/:userId/status", auth(UserRole.ADMIN), userController.updateUserStatusById);
-router.post("/:userId/restore", userController.restoreUserAccount)
 
 export const userRoute = router;
 
