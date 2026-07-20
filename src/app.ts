@@ -7,6 +7,7 @@ import { userRoute } from "./modules/user/user.route";
 import { authRoutes } from "./modules/auth/auth.route";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import { notFound } from "./middleware/notFound";
+import { profileRoutes } from "./modules/profile/profile.route";
 
 
 const app: Application = express();
@@ -38,8 +39,9 @@ app.get('/', (req, res) => {
     )
 })
 
-app.use('/api/users', userRoute);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoute);
+app.use("/api/profile",profileRoutes);
 
 app.use(notFound);
 
