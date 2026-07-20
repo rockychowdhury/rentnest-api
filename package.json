@@ -18,7 +18,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "seed:geo": "tsx scripts/seed-geo.ts",
+    "seed:categories": "tsx scripts/seed-categories.ts",
+    "seed:amenities": "tsx scripts/seed-amenities.ts",
+    "seed:all": "npm run seed:geo && npm run seed:categories && npm run seed:amenities"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
