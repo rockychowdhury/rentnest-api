@@ -3,8 +3,9 @@ import { calculatePagination } from "../../utils/calculatePagination";
 import { IPropertyCreatePayload, IPropertyUpdatePayload, IPropertyAmenitiesSetPayload} from "./property.interface";
 import { IQuery } from "../../types";
 import { PropertyStatus } from "../../../generated/prisma/enums";
+import { PropertySelect } from "../../../generated/prisma/models";
 
-const propertySelect = {
+const propertySelect: PropertySelect = {
     id: true,
     title: true,
     description: true,
@@ -14,8 +15,13 @@ const propertySelect = {
     landlord: {
         select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            phone:true,
+            email:true,
+            profile:{
+                select:{
+                    fullName:true,
+                }
+            }
         }
     },
     category: {
