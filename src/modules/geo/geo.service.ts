@@ -1,13 +1,30 @@
 import { prisma } from "../../lib/prisma";
 import { IDivisionCreatePayload, IDistrictCreatePayload, IUpazilaCreatePayload } from "./geo.interface";
+import { DivisionSelect, DistrictSelect, UpazilaSelect } from "../../../generated/prisma/models";
+
+const divisionSelect: DivisionSelect = {
+    id: true,
+    name: true,
+    bnName: true,
+};
+
+const districtSelect: DistrictSelect = {
+    id: true,
+    name: true,
+    bnName: true,
+    divisionId: true,
+};
+
+const upazilaSelect: UpazilaSelect = {
+    id: true,
+    name: true,
+    bn_name: true,
+    districtId: true,
+};
 
 const getAllDivisions = async () => {
     const result = await prisma.division.findMany({
-        select: {
-            id: true,
-            name: true,
-            bnName: true,
-        },
+        select: divisionSelect,
         orderBy: {
             name: 'asc'
         }
@@ -18,12 +35,7 @@ const getAllDivisions = async () => {
 const getDistrictsByDivision = async (divisionId: number) => {
     const result = await prisma.district.findMany({
         where: { divisionId },
-        select: {
-            id: true,
-            name: true,
-            bnName: true,
-            divisionId: true,
-        },
+        select: districtSelect,
         orderBy: {
             name: 'asc'
         }
@@ -34,12 +46,7 @@ const getDistrictsByDivision = async (divisionId: number) => {
 const getDistrictById = async (id: number) => {
     const result = await prisma.district.findUniqueOrThrow({
         where: { id },
-        select: {
-            id: true,
-            name: true,
-            bnName: true,
-            divisionId: true,
-        }
+        select: districtSelect
     });
     return result;
 };
@@ -47,12 +54,7 @@ const getDistrictById = async (id: number) => {
 const getUpazilasByDistrict = async (districtId: number) => {
     const result = await prisma.upazila.findMany({
         where: { districtId },
-        select: {
-            id: true,
-            name: true,
-            bn_name: true,
-            districtId: true,
-        },
+        select: upazilaSelect,
         orderBy: {
             name: 'asc'
         }
@@ -64,21 +66,12 @@ const getUpazilaById = async (id: number) => {
     const result = await prisma.upazila.findUniqueOrThrow({
         where: { id },
         select: {
-            id: true,
-            name: true,
-            bn_name: true,
-            districtId: true,
+            ...upazilaSelect,
             district: {
                 select: {
-                    id: true,
-                    name: true,
-                    bnName: true,
+                    ...districtSelect,
                     division: {
-                        select: {
-                            id: true,
-                            name: true,
-                            bnName: true,
-                        }
+                        select: divisionSelect
                     }
                 }
             }
@@ -95,13 +88,9 @@ const searchUpazilas = async (query: string) => {
                 { bn_name: { contains: query, mode: "insensitive" } }
             ]
         } : undefined,
-        take: 50, // optimal hard limit to ensure fastest response time
+        take: 50,
         select: {
-            id: true,
-            name: true,
-            bn_name: true,
-            districtId: true,
-            // Including parent names is critical for typeahead context without N+1 queries
+            ...upazilaSelect,
             district: {
                 select: {
                     name: true,
@@ -125,11 +114,7 @@ const searchUpazilas = async (query: string) => {
 const createDivision = async (payload: IDivisionCreatePayload) => {
     const result = await prisma.division.create({
         data: payload,
-        select: {
-            id: true,
-            name: true,
-            bnName: true
-        }
+        select: divisionSelect
     });
     return result;
 };
@@ -137,12 +122,7 @@ const createDivision = async (payload: IDivisionCreatePayload) => {
 const createDistrict = async (payload: IDistrictCreatePayload) => {
     const result = await prisma.district.create({
         data: payload,
-        select: {
-            id: true,
-            name: true,
-            bnName: true,
-            divisionId: true
-        }
+        select: districtSelect
     });
     return result;
 };
@@ -154,12 +134,7 @@ const createUpazila = async (payload: IUpazilaCreatePayload) => {
             bn_name: payload.bnName,
             districtId: payload.districtId
         },
-        select: {
-            id: true,
-            name: true,
-            bn_name: true,
-            districtId: true
-        }
+        select: upazilaSelect
     });
     return result;
 };
