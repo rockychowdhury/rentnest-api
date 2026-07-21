@@ -24,7 +24,7 @@ enum PropertyStatus {
 
 enum PropertyUnitStatus {
   AVAILABLE
-  RENTED
+  OCCUPIED
   MAINTENANCE
 }
 
