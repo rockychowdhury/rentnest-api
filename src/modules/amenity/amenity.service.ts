@@ -1,7 +1,15 @@
 import { prisma } from "../../lib/prisma";
+import { calculatePagination } from "../../utils/calculatePagination";
 import { IAmenityCreatePayload, IAmenityUpdatePayload } from "./amenity.interface";
 import { IQuery } from "../../types";
-import { AmenityWhereInput } from "../../../generated/prisma/models";
+import { AmenityWhereInput, AmenitySelect } from "../../../generated/prisma/models";
+
+const amenitySelect: AmenitySelect = {
+    id: true,
+    name: true,
+    description: true,
+    createdAt: true,
+};
 
 const createAmenity = async (payload: IAmenityCreatePayload) => {
     const result = await prisma.amenity.create({
@@ -11,11 +19,7 @@ const createAmenity = async (payload: IAmenityCreatePayload) => {
 };
 
 const getAllAmenities = async (query: IQuery) => {
-    const { searchTerm, page, limit, sortBy, sortOrder } = query;
-
-    const limitNumber = limit ? parseInt(limit) : 20;
-    const pageNumber = page ? parseInt(page) : 1;
-    const skip = (pageNumber - 1) * limitNumber;
+    const { searchTerm, page, limit, skip, take, orderBy } = calculatePagination(query);
 
     const whereConditions: AmenityWhereInput = {};
 
@@ -26,25 +30,13 @@ const getAllAmenities = async (query: IQuery) => {
         ];
     }
 
-    const sortOptions: any = {};
-    if (sortBy) {
-        sortOptions[sortBy] = sortOrder || 'asc';
-    } else {
-        sortOptions['createdAt'] = 'desc';
-    }
-
     const [data, total] = await Promise.all([
         prisma.amenity.findMany({
             where: whereConditions,
             skip,
-            take: limitNumber,
-            orderBy: sortOptions,
-            select: {
-                id: true,
-                name: true,
-                description: true,
-                createdAt: true,
-            }
+            take,
+            orderBy,
+            select: amenitySelect
         }),
         prisma.amenity.count({
             where: whereConditions
@@ -54,8 +46,8 @@ const getAllAmenities = async (query: IQuery) => {
     return {
         data,
         meta: {
-            page: pageNumber,
-            limit: limitNumber,
+            page,
+            limit,
             total
         }
     };
@@ -72,10 +64,7 @@ const updateAmenity = async (id: string, payload: IAmenityUpdatePayload) => {
 const deleteAmenity = async (id: string) => {
     const result = await prisma.amenity.delete({
         where: { id },
-        select: {
-            id: true,
-            name: true,
-        }
+        select: amenitySelect
     });
     return result;
 };
