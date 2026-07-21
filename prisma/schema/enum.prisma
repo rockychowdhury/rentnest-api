@@ -22,7 +22,7 @@ enum PropertyStatus {
   INACTIVE
 }
 
-enum UnitStatus {
+enum PropertyUnitStatus {
   AVAILABLE
   RENTED
   MAINTENANCE
