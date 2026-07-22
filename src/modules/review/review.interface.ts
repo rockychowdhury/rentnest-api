@@ -1,6 +1,6 @@
 export interface IReviewCreatePayload {
     propertyId: string;
-    leaseId?: string;
+    leaseId: string;
     rating: number;
     comment?: string;
 }

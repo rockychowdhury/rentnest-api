@@ -3,6 +3,7 @@ import { calculatePagination } from "../../utils/calculatePagination";
 import { IQuery } from "../../types";
 import { ReviewSelect } from "../../../generated/prisma/models";
 import { IReviewCreatePayload, IReviewRespondPayload, IReviewUpdatePayload } from "./review.interface";
+import { LeaseStatus } from "../../../generated/prisma/enums";
 
 const reviewSelect: ReviewSelect = {
     id: true,
@@ -45,16 +46,18 @@ const getReviewsByPropertyId = async (propertyId: string, query?: IQuery) => {
 };
 
 const createReview = async (tenantId: string, payload: IReviewCreatePayload) => {
-    if (payload.leaseId) {
-        await prisma.lease.findFirstOrThrow({
-            where: {
-                id: payload.leaseId,
-                tenantId,
-                propertyUnit: {
-                    propertyId: payload.propertyId
-                }
+    const {leaseId, propertyId} = payload;
+    const lease = await prisma.lease.findFirstOrThrow({
+        where: {
+            id: leaseId,
+            tenantId,
+            propertyUnit: {
+                propertyId
             }
-        });
+        }
+    });
+    if(lease.status !== LeaseStatus.COMPLETED){
+        throw new Error ("Your lease status is not Completed Yet.")
     }
 
     const result = await prisma.review.create({
