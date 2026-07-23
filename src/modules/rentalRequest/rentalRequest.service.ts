@@ -43,7 +43,7 @@ const createRentalRequest = async (tenantId: string, payload: IRentalRequestCrea
     const pricing = await prisma.pricing.findUniqueOrThrow({
         where: { id: payload.pricingId }
     });
-
+    const agreedAmount = Number(pricing.rentAmount) + Number(pricing.securityDeposit)
     const result = await prisma.rentalRequest.create({
         data: {
             tenantId,
@@ -52,7 +52,8 @@ const createRentalRequest = async (tenantId: string, payload: IRentalRequestCrea
             moveInDate: new Date(payload.moveInDate),
             duration: payload.duration,
             message: payload.message,
-            agreedAmount: pricing.rentAmount,
+            agreedAmount,
+            currency: pricing.currency,
             rentType: pricing.rentType
         },
         select: requestSelect
@@ -62,7 +63,7 @@ const createRentalRequest = async (tenantId: string, payload: IRentalRequestCrea
 
 const getMyRentalRequests = async (tenantId: string, query?: IQuery) => {
     const { page, limit, skip, take, orderBy } = calculatePagination(query);
-    
+
     const status = (query as any)?.status;
     const where: RentalRequestWhereInput = { tenantId };
     if (status) where.status = status;
@@ -83,7 +84,7 @@ const getMyRentalRequests = async (tenantId: string, query?: IQuery) => {
 
 const getIncomingRentalRequests = async (landlordId: string, query?: IQuery) => {
     const { page, limit, skip, take, orderBy } = calculatePagination(query);
-    
+
     const status = (query as any)?.status;
     const propertyUnitId = (query as any)?.propertyUnitId;
 
@@ -133,7 +134,7 @@ const cancelRentalRequest = async (id: string, tenantId: string) => {
 
 const respondToRentalRequest = async (id: string, landlordId: string, payload: IRentalRequestRespondPayload) => {
     const rentReq = await prisma.rentalRequest.findFirstOrThrow({
-        where: { 
+        where: {
             id,
             propertyUnit: { property: { landlordId } }
         }
@@ -157,6 +158,7 @@ const respondToRentalRequest = async (id: string, landlordId: string, payload: I
             await tx.lease.create({
                 data: {
                     propertyUnitId: rentReq.propertyUnitId,
+                    landlordId:landlordId,
                     tenantId: rentReq.tenantId,
                     rentalRequestId: id,
                     rentType: rentReq.rentType,
@@ -167,7 +169,7 @@ const respondToRentalRequest = async (id: string, landlordId: string, payload: I
 
             await tx.propertyUnit.update({
                 where: { id: rentReq.propertyUnitId },
-                data: { status:PropertyUnitStatus.OCCUPIED}
+                data: { status: PropertyUnitStatus.OCCUPIED }
             });
         }
 

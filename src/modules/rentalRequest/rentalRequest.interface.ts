@@ -1,4 +1,3 @@
-import { RentalRequestStatus } from "../../../generated/prisma/enums";
 
 export interface IRentalRequestCreatePayload {
     propertyUnitId: string;
