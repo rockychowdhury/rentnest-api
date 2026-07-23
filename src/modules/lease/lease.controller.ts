@@ -30,7 +30,8 @@ const getLandlordLeases = catchAsync(async (req: Request, res: Response) => {
 
 const getLeaseById = catchAsync(async (req: Request, res: Response) => {
     const { leaseId } = req.params;
-    const result = await leaseService.getLeaseById(leaseId as string);
+    const userId = req.user?.id as string;
+    const result = await leaseService.getLeaseById(leaseId as string, userId);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -54,7 +55,8 @@ const updateLeaseStatus = catchAsync(async (req: Request, res: Response) => {
 
 const getLeasePayments = catchAsync(async (req: Request, res: Response) => {
     const { leaseId } = req.params;
-    const result = await leaseService.getLeasePayments(leaseId as string);
+    const userId = req.user?.id as string;
+    const result = await leaseService.getLeasePayments(leaseId as string, userId);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,

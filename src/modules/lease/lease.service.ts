@@ -84,9 +84,15 @@ const getLandlordLeases = async (landlordId: string, query?: IQuery) => {
     return { data, meta: { page, limit, total } };
 };
 
-const getLeaseById = async (id: string) => {
-    const result = await prisma.lease.findUniqueOrThrow({
-        where: { id },
+const getLeaseById = async (id: string, userId: string) => {
+    const result = await prisma.lease.findFirstOrThrow({
+        where: { 
+            id,
+            OR: [
+                { tenantId: userId },
+                { landlordId: userId }
+            ]
+        },
         select: leaseSelect
     });
     return result;
@@ -117,7 +123,17 @@ const updateLeaseStatus = async (id: string, landlordId: string, payload: ILease
     return result;
 };
 
-const getLeasePayments = async (id: string) => {
+const getLeasePayments = async (id: string, userId: string) => {
+    await prisma.lease.findFirstOrThrow({
+        where: {
+            id,
+            OR: [
+                { tenantId: userId },
+                { landlordId: userId }
+            ]
+        }
+    });
+
     const result = await prisma.payment.findMany({
         where: { leaseId: id },
         orderBy: { createdAt: 'desc' }
