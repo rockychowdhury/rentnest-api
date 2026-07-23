@@ -112,9 +112,15 @@ const getIncomingRentalRequests = async (landlordId: string, query?: IQuery) => 
     return { data, meta: { page, limit, total } };
 };
 
-const getRentalRequestById = async (id: string) => {
-    const result = await prisma.rentalRequest.findUniqueOrThrow({
-        where: { id },
+const getRentalRequestById = async (id: string, userId: string) => {
+    const result = await prisma.rentalRequest.findFirstOrThrow({
+        where: { 
+            id,
+            OR: [
+                { tenantId: userId },
+                { propertyUnit: { property: { landlordId: userId } } }
+            ]
+        },
         select: requestSelect
     });
     return result;

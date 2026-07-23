@@ -42,7 +42,8 @@ const getIncomingRentalRequests = catchAsync(async (req: Request, res: Response)
 
 const getRentalRequestById = catchAsync(async (req: Request, res: Response) => {
     const { rentalRequestId } = req.params;
-    const result = await rentalRequestService.getRentalRequestById(rentalRequestId as string);
+    const userId = req.user?.id as string;
+    const result = await rentalRequestService.getRentalRequestById(rentalRequestId as string, userId);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
