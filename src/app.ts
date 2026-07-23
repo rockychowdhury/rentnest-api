@@ -32,9 +32,7 @@ app.use(cors(
     }
 ));
 
-app.post("/api/subscription/webhook",express.raw({type: 'application/json'}),()=>{
-    
-});
+app.use("/api/payments/webhook",express.raw({ type: 'application/json' }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
