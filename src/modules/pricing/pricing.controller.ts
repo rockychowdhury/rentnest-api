@@ -18,7 +18,8 @@ const getPricingByUnitId = catchAsync(async (req: Request, res: Response) => {
 const createPricing = catchAsync(async (req: Request, res: Response) => {
     const { unitId } = req.params;
     const payload = req.body;
-    const result = await pricingService.createPricing(unitId as string, payload);
+    const landlordId = req.user?.id as string;
+    const result = await pricingService.createPricing(unitId as string, landlordId, payload);
     sendResponse(res, {
         statusCode: status.CREATED,
         success: true,
@@ -30,7 +31,8 @@ const createPricing = catchAsync(async (req: Request, res: Response) => {
 const updatePricing = catchAsync(async (req: Request, res: Response) => {
     const { pricingId } = req.params;
     const payload = req.body;
-    const result = await pricingService.updatePricing(pricingId as string, payload);
+    const landlordId = req.user?.id as string;
+    const result = await pricingService.updatePricing(pricingId as string, landlordId, payload);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -41,7 +43,8 @@ const updatePricing = catchAsync(async (req: Request, res: Response) => {
 
 const deletePricing = catchAsync(async (req: Request, res: Response) => {
     const { pricingId } = req.params;
-    const result = await pricingService.deletePricing(pricingId as string);
+    const landlordId = req.user?.id as string;
+    const result = await pricingService.deletePricing(pricingId as string, landlordId);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,

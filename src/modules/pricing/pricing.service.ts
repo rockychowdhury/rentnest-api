@@ -23,7 +23,11 @@ const getPricingByUnitId = async (propertyUnitId: string) => {
     return result;
 };
 
-const createPricing = async (propertyUnitId: string, payload: IPricingCreatePayload) => {
+const createPricing = async (propertyUnitId: string, landlordId: string, payload: IPricingCreatePayload) => {
+    await prisma.propertyUnit.findFirstOrThrow({
+        where: { id: propertyUnitId, property: { landlordId } }
+    });
+
     const result = await prisma.pricing.create({
         data: {
             propertyUnitId,
@@ -34,7 +38,11 @@ const createPricing = async (propertyUnitId: string, payload: IPricingCreatePayl
     return result;
 };
 
-const updatePricing = async (id: string, payload: IPricingUpdatePayload) => {
+const updatePricing = async (id: string, landlordId: string, payload: IPricingUpdatePayload) => {
+    await prisma.pricing.findFirstOrThrow({
+        where: { id, propertyUnit: { property: { landlordId } } }
+    });
+
     const result = await prisma.pricing.update({
         where: { id },
         data: payload,
@@ -43,7 +51,11 @@ const updatePricing = async (id: string, payload: IPricingUpdatePayload) => {
     return result;
 };
 
-const deletePricing = async (id: string) => {
+const deletePricing = async (id: string, landlordId: string) => {
+    await prisma.pricing.findFirstOrThrow({
+        where: { id, propertyUnit: { property: { landlordId } } }
+    });
+
     const result = await prisma.pricing.delete({
         where: { id },
         select: { id: true, rentType: true }
