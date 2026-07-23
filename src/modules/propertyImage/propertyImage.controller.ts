@@ -19,7 +19,8 @@ const getImagesByPropertyId = catchAsync(async (req: Request, res: Response) => 
 const createPropertyImage = catchAsync(async (req: Request, res: Response) => {
     const { propertyId } = req.params;
     const payload = req.body;
-    const result = await propertyImageService.createPropertyImage(propertyId as string, payload);
+    const landlordId = req.user?.id as string;
+    const result = await propertyImageService.createPropertyImage(propertyId as string, landlordId, payload);
     sendResponse(res, {
         statusCode: status.CREATED,
         success: true,
@@ -31,7 +32,8 @@ const createPropertyImage = catchAsync(async (req: Request, res: Response) => {
 const updatePropertyImage = catchAsync(async (req: Request, res: Response) => {
     const { imageId } = req.params;
     const payload = req.body;
-    const result = await propertyImageService.updatePropertyImage(imageId as string, payload);
+    const landlordId = req.user?.id as string;
+    const result = await propertyImageService.updatePropertyImage(imageId as string, landlordId, payload);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -42,7 +44,8 @@ const updatePropertyImage = catchAsync(async (req: Request, res: Response) => {
 
 const deletePropertyImage = catchAsync(async (req: Request, res: Response) => {
     const { imageId } = req.params;
-    const result = await propertyImageService.deletePropertyImage(imageId as string);
+    const landlordId = req.user?.id as string;
+    const result = await propertyImageService.deletePropertyImage(imageId as string, landlordId);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,

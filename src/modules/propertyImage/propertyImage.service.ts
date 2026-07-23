@@ -25,7 +25,11 @@ const getImagesByPropertyId = async (propertyId: string) => {
 };
 
 
-const createPropertyImage = async (propertyId: string, payload: IPropertyImageCreatePayload) => {
+const createPropertyImage = async (propertyId: string, landlordId: string, payload: IPropertyImageCreatePayload) => {
+    await prisma.property.findFirstOrThrow({
+        where: { id: propertyId, landlordId }
+    });
+
     if (payload.isCover) {
         await prisma.propertyImage.updateMany({
             where: { propertyId, isCover: true },
@@ -43,15 +47,17 @@ const createPropertyImage = async (propertyId: string, payload: IPropertyImageCr
     return result;
 };
 
-const updatePropertyImage = async (id: string, payload: IPropertyImageUpdatePayload) => {
+const updatePropertyImage = async (id: string, landlordId: string, payload: IPropertyImageUpdatePayload) => {
+    const imageToUpdate = await prisma.propertyImage.findFirstOrThrow({
+        where: { id, property: { landlordId } },
+        select: { propertyId: true }
+    });
+
     if (payload.isCover) {
-        const imageToUpdate = await prisma.propertyImage.findUnique({ where: { id }, select: { propertyId: true } });
-        if (imageToUpdate) {
-            await prisma.propertyImage.updateMany({
-                where: { propertyId: imageToUpdate.propertyId, isCover: true },
-                data: { isCover: false }
-            });
-        }
+        await prisma.propertyImage.updateMany({
+            where: { propertyId: imageToUpdate.propertyId, isCover: true },
+            data: { isCover: false }
+        });
     }
 
     const result = await prisma.propertyImage.update({
@@ -62,9 +68,9 @@ const updatePropertyImage = async (id: string, payload: IPropertyImageUpdatePayl
     return result;
 };
 
-const deletePropertyImage = async (id: string) => {
-    const image = await prisma.propertyImage.findUniqueOrThrow({
-        where: { id },
+const deletePropertyImage = async (id: string, landlordId: string) => {
+    const image = await prisma.propertyImage.findFirstOrThrow({
+        where: { id, property: { landlordId } },
         select: { deleteUrl: true }
     });
 
