@@ -5,7 +5,7 @@ import { UserRole } from "../../../generated/prisma/enums";
 
 const router = Router();
 
-router.post("/checkout/:leaseId", auth(UserRole.TENANT), paymentController.initiatePayment); // payment url return -> redirect to payment page
+router.post("/checkout/lease/:leaseId", auth(UserRole.TENANT), paymentController.initiatePayment); // payment url return -> redirect to payment page
 router.post("/webhook", paymentController.stripeWebhook);
 router.get("/my-payments", auth(UserRole.TENANT), paymentController.getMyPayments);
 router.get("/landlord-payments", auth(UserRole.LANDLORD), paymentController.getLandlordPayments);
