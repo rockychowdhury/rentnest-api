@@ -54,7 +54,11 @@ const getPropertyUnitById = async (id: string) => {
     return result;
 };
 
-const createPropertyUnit = async (propertyId: string, payload: IPropertyUnitCreatePayload) => {
+const createPropertyUnit = async (propertyId: string, landlordId: string, payload: IPropertyUnitCreatePayload) => {
+    await prisma.property.findFirstOrThrow({
+        where: { id: propertyId, landlordId }
+    });
+
     const result = await prisma.propertyUnit.create({
         data: {
             propertyId,
@@ -65,7 +69,11 @@ const createPropertyUnit = async (propertyId: string, payload: IPropertyUnitCrea
     return result;
 };
 
-const updatePropertyUnit = async (id: string, payload: IPropertyUnitUpdatePayload) => {
+const updatePropertyUnit = async (id: string, landlordId: string, payload: IPropertyUnitUpdatePayload) => {
+    await prisma.propertyUnit.findFirstOrThrow({
+        where: { id, property: { landlordId } }
+    });
+
     const result = await prisma.propertyUnit.update({
         where: { id },
         data: payload,
@@ -74,7 +82,11 @@ const updatePropertyUnit = async (id: string, payload: IPropertyUnitUpdatePayloa
     return result;
 };
 
-const updatePropertyUnitStatus = async (id: string, payload: IPropertyUnitStatusUpdatePayload) => {
+const updatePropertyUnitStatus = async (id: string, landlordId: string, payload: IPropertyUnitStatusUpdatePayload) => {
+    await prisma.propertyUnit.findFirstOrThrow({
+        where: { id, property: { landlordId } }
+    });
+
     const result = await prisma.propertyUnit.update({
         where: { id },
         data: { status: payload.status },
@@ -83,7 +95,11 @@ const updatePropertyUnitStatus = async (id: string, payload: IPropertyUnitStatus
     return result;
 };
 
-const deletePropertyUnit = async (id: string) => {
+const deletePropertyUnit = async (id: string, landlordId: string) => {
+    await prisma.propertyUnit.findFirstOrThrow({
+        where: { id, property: { landlordId } }
+    });
+
     const result = await prisma.propertyUnit.update({
         where: { id },
         data: { deletedAt: new Date() },
