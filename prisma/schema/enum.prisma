@@ -45,6 +45,7 @@ enum RentalRequestStatus {
 }
 
 enum LeaseStatus {
+  PENDING_PAYMENT
   ACTIVE
   COMPLETED
   TERMINATED
@@ -55,19 +56,11 @@ enum PaymentStatus {
   COMPLETED
   FAILED
   REFUNDED
+  EXPIRED
 }
 
-enum PaymentType {
-  BOOKING_FEE
-  SECURITY_DEPOSIT
-  MONTHLY_RENT
-}
 
-enum PaymentMethod {
-  CARD
-  BKASH
-  NAGAD
-  ROCKET
-  NET_BANKING
-  CASH
+enum Currency {
+  BDT
+  USD
 }
