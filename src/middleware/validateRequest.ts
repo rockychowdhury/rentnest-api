@@ -4,12 +4,18 @@ import { z } from 'zod';
 const validateRequest = (schema: z.ZodTypeAny) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await schema.parseAsync({
+      const parsedData = await schema.parseAsync({
         body: req.body,
         query: req.query,
         params: req.params,
         cookies: req.cookies,
-      });
+      }) as any;
+
+      if (parsedData.body !== undefined) req.body = parsedData.body;
+      if (parsedData.query !== undefined) req.query = parsedData.query;
+      if (parsedData.params !== undefined) req.params = parsedData.params;
+      if (parsedData.cookies !== undefined) req.cookies = parsedData.cookies;
+
       return next();
     } catch (error) {
       next(error);
