@@ -52,7 +52,7 @@ const getUserById = catchAsync(
 const updateUserStatusById = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
         const payload = req.body;
-        const userId = req.user?.id;
+        const {userId} = req.params;
         const updatedUser = await userService.updateUserStatusById(payload, userId as string);
         sendResponse(res, {
             success: true,

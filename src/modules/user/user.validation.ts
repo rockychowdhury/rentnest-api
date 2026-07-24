@@ -7,7 +7,7 @@ const createUserSchema = z.object({
     phone: z.string().min(1, 'Phone is required'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
     fullName: z.string().min(1, 'Full name is required').max(255),
-    role: z.nativeEnum(UserRole).optional(),
+    role: z.enum([UserRole.TENANT, UserRole.LANDLORD]).optional(),
   }),
 });
 
