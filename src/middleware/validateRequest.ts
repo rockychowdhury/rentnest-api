@@ -12,9 +12,6 @@ const validateRequest = (schema: z.ZodTypeAny) => {
       }) as any;
 
       if (parsedData.body !== undefined) req.body = parsedData.body;
-      if (parsedData.query !== undefined) req.query = { ...req.query, ...parsedData.query };
-      if (parsedData.params !== undefined) req.params = { ...req.params, ...parsedData.params };
-      if (parsedData.cookies !== undefined) req.cookies = { ...req.cookies, ...parsedData.cookies };
 
       return next();
     } catch (error) {
