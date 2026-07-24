@@ -68,48 +68,11 @@ const searchUpazilas = catchAsync(async (req: Request, res: Response) => {
         data: result
     });
 });
-
-const createDivision = catchAsync(async (req: Request, res: Response) => {
-    const payload = req.body;
-    const result = await geoService.createDivision(payload);
-    sendResponse(res, {
-        statusCode: status.CREATED,
-        success: true,
-        message: "Division created successfully",
-        data: result
-    });
-});
-
-const createDistrict = catchAsync(async (req: Request, res: Response) => {
-    const payload = req.body;
-    const result = await geoService.createDistrict(payload);
-    sendResponse(res, {
-        statusCode: status.CREATED,
-        success: true,
-        message: "District created successfully",
-        data: result
-    });
-});
-
-const createUpazila = catchAsync(async (req: Request, res: Response) => {
-    const payload = req.body;
-    const result = await geoService.createUpazila(payload);
-    sendResponse(res, {
-        statusCode: status.CREATED,
-        success: true,
-        message: "Upazila created successfully",
-        data: result
-    });
-});
-
 export const geoController = {
     getAllDivisions,
     getDistrictsByDivision,
     getDistrictById,
     getUpazilasByDistrict,
     getUpazilaById,
-    searchUpazilas,
-    createDivision,
-    createDistrict,
-    createUpazila
+    searchUpazilas
 };

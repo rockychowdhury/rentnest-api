@@ -14,8 +14,4 @@ router.get("/districts/:districtId/upazilas", validateRequest(GeoValidation.getU
 router.get("/upazilas/search", validateRequest(GeoValidation.searchUpazilasSchema), geoController.searchUpazilas);
 router.get("/upazilas/:upazilaId", validateRequest(GeoValidation.getUpazilaByIdSchema), geoController.getUpazilaById);
 
-router.post("/divisions", auth(UserRole.ADMIN), validateRequest(GeoValidation.createGeoSchema), geoController.createDivision);
-router.post("/districts", auth(UserRole.ADMIN), validateRequest(GeoValidation.createGeoSchema), geoController.createDistrict);
-router.post("/upazilas", auth(UserRole.ADMIN), validateRequest(GeoValidation.createUpazilaSchema), geoController.createUpazila);
-
 export const geoRoutes = router;

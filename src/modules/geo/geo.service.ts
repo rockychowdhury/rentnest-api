@@ -1,5 +1,4 @@
 import { prisma } from "../../lib/prisma";
-import { IDivisionCreatePayload, IDistrictCreatePayload, IUpazilaCreatePayload } from "./geo.interface";
 import { DivisionSelect, DistrictSelect, UpazilaSelect } from "../../../generated/prisma/models";
 
 const divisionSelect: DivisionSelect = {
@@ -110,43 +109,11 @@ const searchUpazilas = async (query: string) => {
     });
     return result;
 };
-
-const createDivision = async (payload: IDivisionCreatePayload) => {
-    const result = await prisma.division.create({
-        data: payload,
-        select: divisionSelect
-    });
-    return result;
-};
-
-const createDistrict = async (payload: IDistrictCreatePayload) => {
-    const result = await prisma.district.create({
-        data: payload,
-        select: districtSelect
-    });
-    return result;
-};
-
-const createUpazila = async (payload: IUpazilaCreatePayload) => {
-    const result = await prisma.upazila.create({
-        data: {
-            name: payload.name,
-            bn_name: payload.bnName,
-            districtId: payload.districtId
-        },
-        select: upazilaSelect
-    });
-    return result;
-};
-
 export const geoService = {
     getAllDivisions,
     getDistrictsByDivision,
     getDistrictById,
     getUpazilasByDistrict,
     getUpazilaById,
-    searchUpazilas,
-    createDivision,
-    createDistrict,
-    createUpazila
+    searchUpazilas
 };
