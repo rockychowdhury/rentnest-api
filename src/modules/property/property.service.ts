@@ -3,7 +3,7 @@ import { calculatePagination } from "../../utils/calculatePagination";
 import { IPropertyCreatePayload, IPropertyUpdatePayload, IPropertyAmenitiesSetPayload} from "./property.interface";
 import { IQuery } from "../../types";
 import { PropertyStatus } from "../../../generated/prisma/enums";
-import { PropertySelect } from "../../../generated/prisma/models";
+import { PropertySelect, PropertyWhereInput } from "../../../generated/prisma/models";
 
 const propertySelect: PropertySelect = {
     id: true,
@@ -48,17 +48,67 @@ const propertySelect: PropertySelect = {
 
 const getAllProperties = async (query: IQuery) => {
     const { searchTerm, page, limit, skip, take, orderBy } = calculatePagination(query);
+    const { location, categoryId, minPrice, maxPrice, amenities } = query as any;
 
-    const whereConditions: any = {
-        deletedAt: null
-    };
+    const andConditions: PropertyWhereInput[] = [
+        { deletedAt: null },
+        { status: PropertyStatus.PUBLISHED }
+    ];
 
     if (searchTerm) {
-        whereConditions.OR = [
-            { title: { contains: searchTerm, mode: "insensitive" } },
-            { description: { contains: searchTerm, mode: "insensitive" } }
-        ];
+        andConditions.push({
+            OR: [
+                { title: { contains: searchTerm, mode: "insensitive" } },
+                { description: { contains: searchTerm, mode: "insensitive" } }
+            ]
+        });
     }
+
+    if (location) {
+        andConditions.push({
+            address: {
+                OR: [
+                    { streetAddress: { contains: location, mode: 'insensitive' } },
+                    { upazila: { name: { contains: location, mode: 'insensitive' } } },
+                    { upazila: { district: { name: { contains: location, mode: 'insensitive' } } } }
+                ]
+            }
+        });
+    }
+
+    if (categoryId) {
+        andConditions.push({ categoryId });
+    }
+
+    if (minPrice || maxPrice) {
+        andConditions.push({
+            units: {
+                some: {
+                    pricing: {
+                        some: {
+                            rentAmount: {
+                                ...(minPrice && { gte: Number(minPrice) }),
+                                ...(maxPrice && { lte: Number(maxPrice) })
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    if (amenities) {
+        const amenityIds = Array.isArray(amenities) ? amenities : amenities.split(',');
+        amenityIds.forEach((id: string) => {
+            andConditions.push({
+                amenities: { some: { amenityId: id } }
+            });
+        });
+    }
+
+    const whereConditions: PropertyWhereInput = {
+        AND: andConditions
+    };
 
     const [data, total] = await Promise.all([
         prisma.property.findMany({
@@ -166,7 +216,13 @@ const createProperty = async (landlordId: string, payload: IPropertyCreatePayloa
     return result;
 };
 
-const updateProperty = async (id: string, payload: IPropertyUpdatePayload) => {
+const updateProperty = async (id: string, userId: string, role: string, payload: IPropertyUpdatePayload) => {
+    if (role !== 'ADMIN') {
+        await prisma.property.findFirstOrThrow({ 
+            where: { id, landlordId: userId } 
+        });
+    }
+
     const result = await prisma.property.update({
         where: { id },
         data: payload,
@@ -175,7 +231,13 @@ const updateProperty = async (id: string, payload: IPropertyUpdatePayload) => {
     return result;
 };
 
-const updatePropertyStatus = async (id: string, payload: { status: PropertyStatus }) => {
+const updatePropertyStatus = async (id: string, userId: string, role: string, payload: { status: PropertyStatus }) => {
+    if (role !== 'ADMIN') {
+        await prisma.property.findFirstOrThrow({ 
+            where: { id, landlordId: userId } 
+        });
+    }
+
     const result = await prisma.property.update({
         where: { id },
         data: { status: payload.status },
@@ -184,7 +246,13 @@ const updatePropertyStatus = async (id: string, payload: { status: PropertyStatu
     return result;
 };
 
-const setPropertyAmenities = async (id: string, payload: IPropertyAmenitiesSetPayload) => {
+const setPropertyAmenities = async (id: string, userId: string, role: string, payload: IPropertyAmenitiesSetPayload) => {
+    if (role !== 'ADMIN') {
+        await prisma.property.findFirstOrThrow({ 
+            where: { id, landlordId: userId } 
+        });
+    }
+
     const result = await prisma.$transaction(async (tx) => {
         await tx.propertyAmenity.deleteMany({
             where: { propertyId: id }
@@ -208,7 +276,13 @@ const setPropertyAmenities = async (id: string, payload: IPropertyAmenitiesSetPa
     return result;
 };
 
-const deleteProperty = async (id: string) => {
+const deleteProperty = async (id: string, userId: string, role: string) => {
+    if (role !== 'ADMIN') {
+        await prisma.property.findFirstOrThrow({ 
+            where: { id, landlordId: userId } 
+        });
+    }
+
     const result = await prisma.property.update({
         where: { id },
         data: { deletedAt: new Date() },
@@ -217,7 +291,13 @@ const deleteProperty = async (id: string) => {
     return result;
 };
 
-const restoreProperty = async (id: string) => {
+const restoreProperty = async (id: string, userId: string, role: string) => {
+    if (role !== 'ADMIN') {
+        await prisma.property.findFirstOrThrow({ 
+            where: { id, landlordId: userId } 
+        });
+    }
+
     const result = await prisma.property.update({
         where: { id },
         data: { deletedAt: null },

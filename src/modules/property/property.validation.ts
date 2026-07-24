@@ -57,7 +57,15 @@ const setPropertyAmenitiesSchema = z.object({
   }),
 });
 
-const getAllPropertiesSchema = z.object({ query: paginationQuerySchema });
+const getAllPropertiesSchema = z.object({
+  query: paginationQuerySchema.extend({
+    location: z.string().optional(),
+    minPrice: z.string().optional(),
+    maxPrice: z.string().optional(),
+    categoryId: z.string().uuid().optional(),
+    amenities: z.string().optional(),
+  }),
+});
 const getLandlordPropertiesSchema = z.object({
   params: z.object({ landlordId: z.string().uuid("Invalid Landlord ID in URL") }),
   query: paginationQuerySchema

@@ -74,8 +74,10 @@ const createProperty = catchAsync(async (req: Request, res: Response) => {
 
 const updateProperty = catchAsync(async (req: Request, res: Response) => {
     const { propertyId } = req.params;
+    const userId = req.user?.id as string;
+    const role = req.user?.role as string;
     const payload = req.body;
-    const result = await propertyService.updateProperty(propertyId as string, payload);
+    const result = await propertyService.updateProperty(propertyId as string, userId, role, payload);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -86,8 +88,10 @@ const updateProperty = catchAsync(async (req: Request, res: Response) => {
 
 const updatePropertyStatus = catchAsync(async (req: Request, res: Response) => {
     const { propertyId } = req.params;
+    const userId = req.user?.id as string;
+    const role = req.user?.role as string;
     const payload = req.body;
-    const result = await propertyService.updatePropertyStatus(propertyId as string, payload);
+    const result = await propertyService.updatePropertyStatus(propertyId as string, userId, role, payload);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -98,8 +102,10 @@ const updatePropertyStatus = catchAsync(async (req: Request, res: Response) => {
 
 const setPropertyAmenities = catchAsync(async (req: Request, res: Response) => {
     const { propertyId } = req.params;
+    const userId = req.user?.id as string;
+    const role = req.user?.role as string;
     const payload = req.body;
-    const result = await propertyService.setPropertyAmenities(propertyId as string, payload);
+    const result = await propertyService.setPropertyAmenities(propertyId as string, userId, role, payload);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -110,7 +116,9 @@ const setPropertyAmenities = catchAsync(async (req: Request, res: Response) => {
 
 const deleteProperty = catchAsync(async (req: Request, res: Response) => {
     const { propertyId } = req.params;
-    const result = await propertyService.deleteProperty(propertyId as string);
+    const userId = req.user?.id as string;
+    const role = req.user?.role as string;
+    const result = await propertyService.deleteProperty(propertyId as string, userId, role);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -121,7 +129,9 @@ const deleteProperty = catchAsync(async (req: Request, res: Response) => {
 
 const restoreProperty = catchAsync(async (req: Request, res: Response) => {
     const { propertyId } = req.params;
-    const result = await propertyService.restoreProperty(propertyId as string);
+    const userId = req.user?.id as string;
+    const role = req.user?.role as string;
+    const result = await propertyService.restoreProperty(propertyId as string, userId, role);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
