@@ -10,6 +10,8 @@ export const paginationQuerySchema = z.object({
 
 export const uuidParamSchema = (paramName: string) => {
   return z.object({
-    [paramName]: z.string().uuid(`Invalid ${paramName} in URL`),
+    params: z.object({
+      [paramName]: z.string().uuid(`Invalid ${paramName} in URL`),
+    }),
   });
 };
