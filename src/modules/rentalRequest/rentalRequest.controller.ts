@@ -16,6 +16,17 @@ const createRentalRequest = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getAllRentalRequests = catchAsync(async (req: Request, res: Response) => {
+    const result = await rentalRequestService.getAllRentalRequests(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "All rental requests retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
 const getMyRentalRequests = catchAsync(async (req: Request, res: Response) => {
     const userId = req.user?.id as string;
     const result = await rentalRequestService.getMyRentalRequests(userId, req.query);
@@ -43,7 +54,8 @@ const getIncomingRentalRequests = catchAsync(async (req: Request, res: Response)
 const getRentalRequestById = catchAsync(async (req: Request, res: Response) => {
     const { rentalRequestId } = req.params;
     const userId = req.user?.id as string;
-    const result = await rentalRequestService.getRentalRequestById(rentalRequestId as string, userId);
+    const role = req.user?.role as string;
+    const result = await rentalRequestService.getRentalRequestById(rentalRequestId as string, userId, role);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -55,7 +67,8 @@ const getRentalRequestById = catchAsync(async (req: Request, res: Response) => {
 const cancelRentalRequest = catchAsync(async (req: Request, res: Response) => {
     const { rentalRequestId } = req.params;
     const tenantId = req.user?.id as string;
-    const result = await rentalRequestService.cancelRentalRequest(rentalRequestId as string, tenantId);
+    const role = req.user?.role as string;
+    const result = await rentalRequestService.cancelRentalRequest(rentalRequestId as string, tenantId, role);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -79,6 +92,7 @@ const respondToRentalRequest = catchAsync(async (req: Request, res: Response) =>
 
 export const rentalRequestController = {
     createRentalRequest,
+    getAllRentalRequests,
     getMyRentalRequests,
     getIncomingRentalRequests,
     getRentalRequestById,

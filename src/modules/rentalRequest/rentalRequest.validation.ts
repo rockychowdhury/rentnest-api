@@ -6,9 +6,6 @@ const createRentalRequestSchema = z.object({
   body: z.object({
     propertyUnitId: z.string().uuid('Valid Property Unit ID is required'),
     pricingId: z.string().uuid('Valid Pricing ID is required'),
-    agreedAmount: z.number().positive('Agreed amount must be positive'),
-    currency: z.nativeEnum(Currency).optional(),
-    rentType: z.nativeEnum(RentType),
     moveInDate: z.string().refine((date) => !isNaN(Date.parse(date)), { message: "Invalid date string" }),
     duration: z.number().int().positive().optional(),
     message: z.string().optional(),

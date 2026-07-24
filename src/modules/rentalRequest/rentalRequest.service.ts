@@ -40,6 +40,14 @@ const requestSelect: RentalRequestSelect = {
 };
 
 const createRentalRequest = async (tenantId: string, payload: IRentalRequestCreatePayload) => {
+    const propertyUnit = await prisma.propertyUnit.findUniqueOrThrow({
+        where: { id: payload.propertyUnitId }
+    });
+
+    if (propertyUnit.status !== PropertyUnitStatus.AVAILABLE) {
+        throw new Error("Property unit is not available for rent");
+    }
+
     const pricing = await prisma.pricing.findUniqueOrThrow({
         where: { id: payload.pricingId }
     });
@@ -59,6 +67,22 @@ const createRentalRequest = async (tenantId: string, payload: IRentalRequestCrea
         select: requestSelect
     });
     return result;
+};
+
+const getAllRentalRequests = async (query: IQuery) => {
+    const { page, limit, skip, take, orderBy } = calculatePagination(query);
+
+    const [data, total] = await Promise.all([
+        prisma.rentalRequest.findMany({
+            skip,
+            take,
+            orderBy,
+            select: requestSelect
+        }),
+        prisma.rentalRequest.count()
+    ]);
+
+    return { data, meta: { page, limit, total } };
 };
 
 const getMyRentalRequests = async (tenantId: string, query?: IQuery) => {
@@ -112,24 +136,31 @@ const getIncomingRentalRequests = async (landlordId: string, query?: IQuery) => 
     return { data, meta: { page, limit, total } };
 };
 
-const getRentalRequestById = async (id: string, userId: string) => {
+const getRentalRequestById = async (id: string, userId: string, role: string) => {
+    const where: any = { id };
+    if (role !== 'ADMIN') {
+        where.OR = [
+            { tenantId: userId },
+            { propertyUnit: { property: { landlordId: userId } } }
+        ];
+    }
+    
     const result = await prisma.rentalRequest.findFirstOrThrow({
-        where: { 
-            id,
-            OR: [
-                { tenantId: userId },
-                { propertyUnit: { property: { landlordId: userId } } }
-            ]
-        },
+        where,
         select: requestSelect
     });
     return result;
 };
 
-const cancelRentalRequest = async (id: string, tenantId: string) => {
-    await prisma.rentalRequest.findFirstOrThrow({
-        where: { id, tenantId }
-    });
+const cancelRentalRequest = async (id: string, tenantId: string, role: string) => {
+    if (role !== 'ADMIN') {
+        await prisma.rentalRequest.findFirstOrThrow({
+            where: { id, tenantId }
+        });
+    } else {
+        await prisma.rentalRequest.findUniqueOrThrow({ where: { id } });
+    }
+    
     const result = await prisma.rentalRequest.update({
         where: { id },
         data: { status: RentalRequestStatus.CANCELLED },
@@ -187,6 +218,7 @@ const respondToRentalRequest = async (id: string, landlordId: string, payload: I
 
 export const rentalRequestService = {
     createRentalRequest,
+    getAllRentalRequests,
     getMyRentalRequests,
     getIncomingRentalRequests,
     getRentalRequestById,
