@@ -31,6 +31,17 @@ const stripeWebhook = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+const getAllPayments = catchAsync(async (req: Request, res: Response) => {
+    const result = await paymentService.getAllPayments(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "All payments retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
 const getMyPayments = catchAsync(async (req: Request, res: Response) => {
     const tenantId = req.user?.id;
     const result = await paymentService.getMyPayments(tenantId as string, req.query);
@@ -63,7 +74,8 @@ const getPaymentById = catchAsync(async (req: Request, res: Response) => {
 
     const { paymentId } = req.params;
     const userId = req.user?.id;
-    const result = await paymentService.getPaymentById(paymentId as string, userId as string);
+    const role = req.user?.role;
+    const result = await paymentService.getPaymentById(paymentId as string, userId as string, role as string);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -75,6 +87,7 @@ const getPaymentById = catchAsync(async (req: Request, res: Response) => {
 
 export const paymentController = {
     initiatePayment,
+    getAllPayments,
     getMyPayments,
     getLandlordPayments,
     stripeWebhook,

@@ -117,16 +117,13 @@ const initiatePayment = async (leaseId: string, tenantId: string) => {
                         {
                             price_data: {
                                 currency: payment.currency,
-                                unit_amount: Number(payment.amount),
+                                unit_amount: Math.round(Number(payment.amount) * 100),
                                 product: productKey
                             },
                             quantity: 1,
                         }
                     ],
                     mode: "payment",
-                    invoice_creation: {
-                        enabled: true,
-                    },
                     customer: customerId,
                     payment_method_types: ["card"],
                     success_url: `${config.app_url}/payment/checkout?success=true`,
@@ -156,15 +153,15 @@ const handlePaymentSuccess = async (session: Stripe.Checkout.Session) => {
     const sessionId = session.id;
     const transactionId = session.payment_intent;
     // const { leaseId, paymentId, tenantId } = session.metadata as any
-    const result = prisma.$transaction(
+    const result = await prisma.$transaction(
         async (tx) => {
-            const payment = await prisma.payment.findUniqueOrThrow({
+            const payment = await tx.payment.findUniqueOrThrow({
                 where: {
                     checkoutSessionId: sessionId
                 }
             });
             if (payment.status === PaymentStatus.COMPLETED) return;
-            const updatedPayment = await prisma.payment.update({
+            const updatedPayment = await tx.payment.update({
                 where: {
                     id: payment.id,
                     checkoutSessionId: session.id
@@ -175,7 +172,7 @@ const handlePaymentSuccess = async (session: Stripe.Checkout.Session) => {
                     transactionId: transactionId as string
                 }
             });
-            const updatedLease = await prisma.lease.update({
+            const updatedLease = await tx.lease.update({
                 where: { id: payment.leaseId as string },
                 data: {
                     status: LeaseStatus.ACTIVE,
@@ -234,6 +231,22 @@ const stripeWebhook = async (payload: Buffer, signature: string) => {
 };
 
 
+const getAllPayments = async (query?: IQuery) => {
+    const { page, limit, skip, take, orderBy } = calculatePagination(query);
+
+    const [data, total] = await Promise.all([
+        prisma.payment.findMany({
+            skip,
+            take,
+            orderBy,
+            select: paymentSelect
+        }),
+        prisma.payment.count()
+    ]);
+
+    return { data, meta: { page, limit, total } };
+};
+
 const getMyPayments = async (tenantId: string, query?: IQuery) => {
     const { page, limit, skip, take, orderBy } = calculatePagination(query);
 
@@ -276,13 +289,13 @@ const getLandlordPayments = async (landlordId: string, query?: IQuery) => {
     return { data, meta: { page, limit, total } };
 };
 
-const getPaymentById = async (paymentId: string, userId: string) => {
+const getPaymentById = async (paymentId: string, userId: string, role: string) => {
     const payment = await prisma.payment.findUniqueOrThrow({
         where: { id: paymentId },
         select: paymentSelect
     });
 
-    if (payment.tenantId !== userId && payment.landlordId !== userId) {
+    if (role !== 'ADMIN' && payment.tenantId !== userId && payment.landlordId !== userId) {
         throw new Error("Unauthorized: You are not authorized to view this payment.");
     }
 
@@ -292,6 +305,7 @@ const getPaymentById = async (paymentId: string, userId: string) => {
 
 export const paymentService = {
     initiatePayment,
+    getAllPayments,
     getMyPayments,
     getLandlordPayments,
     stripeWebhook,
