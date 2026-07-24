@@ -9,7 +9,7 @@ const router = Router();
 
 router.get("/unit/:unitId", validateRequest(PricingValidation.getPricingByUnitIdSchema), pricingController.getPricingByUnitId);
 router.post("/unit/:unitId", auth(UserRole.LANDLORD), validateRequest(PricingValidation.createPricingSchema), pricingController.createPricing);
-router.patch("/:pricingId", auth(UserRole.LANDLORD), validateRequest(PricingValidation.updatePricingSchema), pricingController.updatePricing);
-router.delete("/:pricingId", auth(UserRole.LANDLORD), validateRequest(PricingValidation.deletePricingSchema), pricingController.deletePricing);
+router.patch("/:pricingId", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PricingValidation.updatePricingSchema), pricingController.updatePricing);
+router.delete("/:pricingId", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PricingValidation.deletePricingSchema), pricingController.deletePricing);
 
 export const pricingRoutes = router;
