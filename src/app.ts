@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
     res.status(status.OK).send(
         {
             message: "Server is Healthy",
-            from: "Prisma Press",
+            from: "RentNest API",
             author: "Rocky Chowdhury",
             time: new Date(),
         }

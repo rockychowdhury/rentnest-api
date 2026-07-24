@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { Role } from "../../generated/prisma/enums";
 import { catchAsync } from "../utils/catchAsync";
 import { jwtUtils } from "../utils/jwt";
 import config from "../config";
 import { JwtPayload } from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
+import { UserRole } from "../../generated/prisma/enums";
 
 
 
@@ -17,14 +17,14 @@ declare global {
                 email: string;
                 name: string;
                 id: string;
-                role: Role;
+                role: UserRole;
             }
         }
     }
 }
 
 
-export const auth = (...requiredRoles: Role[]) => {
+export const auth = (...requiredRoles: UserRole[]) => {
     return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
         const token = req.cookies.accessToken ?
             req.cookies.accessToken :
