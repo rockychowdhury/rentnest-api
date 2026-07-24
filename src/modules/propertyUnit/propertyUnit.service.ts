@@ -69,10 +69,12 @@ const createPropertyUnit = async (propertyId: string, landlordId: string, payloa
     return result;
 };
 
-const updatePropertyUnit = async (id: string, landlordId: string, payload: IPropertyUnitUpdatePayload) => {
-    await prisma.propertyUnit.findFirstOrThrow({
-        where: { id, property: { landlordId } }
-    });
+const updatePropertyUnit = async (id: string, landlordId: string, role: string, payload: IPropertyUnitUpdatePayload) => {
+    if (role !== 'ADMIN') {
+        await prisma.propertyUnit.findFirstOrThrow({
+            where: { id, property: { landlordId } }
+        });
+    }
 
     const result = await prisma.propertyUnit.update({
         where: { id },
@@ -82,10 +84,12 @@ const updatePropertyUnit = async (id: string, landlordId: string, payload: IProp
     return result;
 };
 
-const updatePropertyUnitStatus = async (id: string, landlordId: string, payload: IPropertyUnitStatusUpdatePayload) => {
-    await prisma.propertyUnit.findFirstOrThrow({
-        where: { id, property: { landlordId } }
-    });
+const updatePropertyUnitStatus = async (id: string, landlordId: string, role: string, payload: IPropertyUnitStatusUpdatePayload) => {
+    if (role !== 'ADMIN') {
+        await prisma.propertyUnit.findFirstOrThrow({
+            where: { id, property: { landlordId } }
+        });
+    }
 
     const result = await prisma.propertyUnit.update({
         where: { id },
@@ -95,10 +99,12 @@ const updatePropertyUnitStatus = async (id: string, landlordId: string, payload:
     return result;
 };
 
-const deletePropertyUnit = async (id: string, landlordId: string) => {
-    await prisma.propertyUnit.findFirstOrThrow({
-        where: { id, property: { landlordId } }
-    });
+const deletePropertyUnit = async (id: string, landlordId: string, role: string) => {
+    if (role !== 'ADMIN') {
+        await prisma.propertyUnit.findFirstOrThrow({
+            where: { id, property: { landlordId } }
+        });
+    }
 
     const result = await prisma.propertyUnit.update({
         where: { id },

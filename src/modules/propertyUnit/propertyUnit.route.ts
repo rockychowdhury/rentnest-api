@@ -10,9 +10,9 @@ const router = Router();
 router.get("/property/:propertyId", validateRequest(PropertyUnitValidation.getUnitsByPropertyIdSchema), propertyUnitController.getUnitsByPropertyId);
 router.get("/:propertyUnitId", validateRequest(PropertyUnitValidation.getPropertyUnitByIdSchema), propertyUnitController.getPropertyUnitById);
 router.post("/property/:propertyId", auth(UserRole.LANDLORD), validateRequest(PropertyUnitValidation.createPropertyUnitSchema), propertyUnitController.createPropertyUnit);
-router.patch("/:propertyUnitId", auth(UserRole.LANDLORD), validateRequest(PropertyUnitValidation.updatePropertyUnitSchema), propertyUnitController.updatePropertyUnit);
-router.patch("/:propertyUnitId/status", auth(UserRole.LANDLORD), validateRequest(PropertyUnitValidation.updatePropertyUnitStatusSchema), propertyUnitController.updatePropertyUnitStatus);
-router.delete("/:propertyUnitId", auth(UserRole.LANDLORD), validateRequest(PropertyUnitValidation.getPropertyUnitByIdSchema), propertyUnitController.deletePropertyUnit);
+router.patch("/:propertyUnitId", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyUnitValidation.updatePropertyUnitSchema), propertyUnitController.updatePropertyUnit);
+router.patch("/:propertyUnitId/status", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyUnitValidation.updatePropertyUnitStatusSchema), propertyUnitController.updatePropertyUnitStatus);
+router.delete("/:propertyUnitId", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyUnitValidation.getPropertyUnitByIdSchema), propertyUnitController.deletePropertyUnit);
 router.get("/:propertyUnitId/availability", validateRequest(PropertyUnitValidation.getPropertyUnitByIdSchema), propertyUnitController.getPropertyUnitAvailability);
 
 export const propertyUnitRoutes = router;
