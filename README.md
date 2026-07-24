@@ -61,7 +61,7 @@ We used a modern, scalable backend tech stack to ensure high performance, securi
     </tr>
     <tr>
       <td align="center" width="96">
-        <img src="https://raw.githubusercontent.com/stripe/stripe-js/main/docs/assets/logo.svg" width="48" height="48" alt="Stripe" />
+        <img src="https://cdn.simpleicons.org/stripe/635BFF" width="48" height="48" alt="Stripe" />
         <br />Stripe API
       </td>
       <td align="center" width="96">
