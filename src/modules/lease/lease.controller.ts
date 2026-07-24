@@ -4,6 +4,17 @@ import { sendResponse } from "../../utils/sendResponse";
 import status from "http-status";
 import { leaseService } from "./lease.service";
 
+const getAllLeases = catchAsync(async (req: Request, res: Response) => {
+    const result = await leaseService.getAllLeases(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "All leases retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
 const getMyLeases = catchAsync(async (req: Request, res: Response) => {
     const tenantId = req.user?.id as string;
     const result = await leaseService.getMyLeases(tenantId, req.query);
@@ -31,7 +42,8 @@ const getLandlordLeases = catchAsync(async (req: Request, res: Response) => {
 const getLeaseById = catchAsync(async (req: Request, res: Response) => {
     const { leaseId } = req.params;
     const userId = req.user?.id as string;
-    const result = await leaseService.getLeaseById(leaseId as string, userId);
+    const role = req.user?.role as string;
+    const result = await leaseService.getLeaseById(leaseId as string, userId, role);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -42,9 +54,10 @@ const getLeaseById = catchAsync(async (req: Request, res: Response) => {
 
 const updateLeaseStatus = catchAsync(async (req: Request, res: Response) => {
     const { leaseId } = req.params;
-    const landlordId = req.user?.id as string;
+    const userId = req.user?.id as string;
+    const role = req.user?.role as string;
     const payload = req.body;
-    const result = await leaseService.updateLeaseStatus(leaseId as string, landlordId, payload);
+    const result = await leaseService.updateLeaseStatus(leaseId as string, userId, role, payload);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -56,7 +69,8 @@ const updateLeaseStatus = catchAsync(async (req: Request, res: Response) => {
 const getLeasePayments = catchAsync(async (req: Request, res: Response) => {
     const { leaseId } = req.params;
     const userId = req.user?.id as string;
-    const result = await leaseService.getLeasePayments(leaseId as string, userId);
+    const role = req.user?.role as string;
+    const result = await leaseService.getLeasePayments(leaseId as string, userId, role);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -66,6 +80,7 @@ const getLeasePayments = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const leaseController = {
+    getAllLeases,
     getMyLeases,
     getLandlordLeases,
     getLeaseById,

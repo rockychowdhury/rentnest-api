@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/prisma";
 import { calculatePagination } from "../../utils/calculatePagination";
 import { IQuery } from "../../types";
-import { LeaseSelect } from "../../../generated/prisma/models";
+import { LeaseSelect, LeaseWhereInput } from "../../../generated/prisma/models";
 import { ILeaseUpdateStatusPayload } from "./lease.interface";
 import { LeaseStatus, PropertyUnitStatus } from "../../../generated/prisma/enums";
 
@@ -37,11 +37,27 @@ const leaseSelect: LeaseSelect = {
     }
 };
 
+const getAllLeases = async (query?: IQuery) => {
+    const { page, limit, skip, take, orderBy } = calculatePagination(query);
+
+    const [data, total] = await Promise.all([
+        prisma.lease.findMany({
+            skip,
+            take,
+            orderBy,
+            select: leaseSelect
+        }),
+        prisma.lease.count()
+    ]);
+
+    return { data, meta: { page, limit, total } };
+};
+
 const getMyLeases = async (tenantId: string, query?: IQuery) => {
     const { page, limit, skip, take, orderBy } = calculatePagination(query);
 
     const status = (query as any)?.status;
-    const where: any = { tenantId };
+    const where: LeaseWhereInput = { tenantId };
     if (status) where.status = status;
 
     const [data, total] = await Promise.all([
@@ -64,8 +80,8 @@ const getLandlordLeases = async (landlordId: string, query?: IQuery) => {
     const status = (query as any)?.status;
     const propertyUnitId = (query as any)?.propertyUnitId;
 
-    const where: any = {
-        propertyUnit: { property: { landlordId } }
+    const where: LeaseWhereInput = {
+        landlordId
     };
     if (status) where.status = status;
     if (propertyUnitId) where.propertyUnitId = propertyUnitId;
@@ -84,25 +100,28 @@ const getLandlordLeases = async (landlordId: string, query?: IQuery) => {
     return { data, meta: { page, limit, total } };
 };
 
-const getLeaseById = async (id: string, userId: string) => {
+const getLeaseById = async (id: string, userId: string, role: string) => {
+    const where: LeaseWhereInput = { id };
+    if (role !== 'ADMIN') {
+        where.OR = [
+            { tenantId: userId },
+            { landlordId: userId }
+        ];
+    }
     const result = await prisma.lease.findFirstOrThrow({
-        where: { 
-            id,
-            OR: [
-                { tenantId: userId },
-                { landlordId: userId }
-            ]
-        },
+        where,
         select: leaseSelect
     });
     return result;
 };
 
-const updateLeaseStatus = async (id: string, landlordId: string, payload: ILeaseUpdateStatusPayload) => {
+const updateLeaseStatus = async (id: string, userId: string, role: string, payload: ILeaseUpdateStatusPayload) => {
 
-    await prisma.lease.findFirstOrThrow({
-        where: { id, propertyUnit: { property: { landlordId } } }
-    });
+    if (role !== 'ADMIN') {
+        await prisma.lease.findFirstOrThrow({
+            where: { id, landlordId: userId }
+        });
+    }
 
     const result = await prisma.$transaction(async (tx) => {
         const lease = await tx.lease.update({
@@ -123,16 +142,15 @@ const updateLeaseStatus = async (id: string, landlordId: string, payload: ILease
     return result;
 };
 
-const getLeasePayments = async (id: string, userId: string) => {
-    await prisma.lease.findFirstOrThrow({
-        where: {
-            id,
-            OR: [
-                { tenantId: userId },
-                { landlordId: userId }
-            ]
-        }
-    });
+const getLeasePayments = async (id: string, userId: string, role: string) => {
+    const where: any = { id };
+    if (role !== 'ADMIN') {
+        where.OR = [
+            { tenantId: userId },
+            { landlordId: userId }
+        ];
+    }
+    await prisma.lease.findFirstOrThrow({ where });
 
     const result = await prisma.payment.findMany({
         where: { leaseId: id },
@@ -142,6 +160,7 @@ const getLeasePayments = async (id: string, userId: string) => {
 };
 
 export const leaseService = {
+    getAllLeases,
     getMyLeases,
     getLandlordLeases,
     getLeaseById,
