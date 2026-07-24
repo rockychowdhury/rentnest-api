@@ -10,6 +10,6 @@ const router = Router();
 router.get("/property/:propertyId", validateRequest(PropertyImageValidation.getImagesByPropertyIdSchema), propertyImageController.getImagesByPropertyId);
 router.post("/property/:propertyId", auth(UserRole.LANDLORD), validateRequest(PropertyImageValidation.createPropertyImageSchema), propertyImageController.createPropertyImage);
 router.patch("/:imageId", auth(UserRole.LANDLORD), validateRequest(PropertyImageValidation.updatePropertyImageSchema), propertyImageController.updatePropertyImage);
-router.delete("/:imageId", auth(UserRole.LANDLORD), validateRequest(PropertyImageValidation.deletePropertyImageSchema), propertyImageController.deletePropertyImage);
+router.delete("/:imageId", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyImageValidation.deletePropertyImageSchema), propertyImageController.deletePropertyImage);
 
 export const propertyImageRoutes = router;

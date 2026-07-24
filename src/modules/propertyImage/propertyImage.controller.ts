@@ -45,7 +45,8 @@ const updatePropertyImage = catchAsync(async (req: Request, res: Response) => {
 const deletePropertyImage = catchAsync(async (req: Request, res: Response) => {
     const { imageId } = req.params;
     const landlordId = req.user?.id as string;
-    const result = await propertyImageService.deletePropertyImage(imageId as string, landlordId);
+    const role = req.user?.role as string;
+    const result = await propertyImageService.deletePropertyImage(imageId as string, landlordId, role);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,

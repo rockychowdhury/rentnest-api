@@ -68,9 +68,13 @@ const updatePropertyImage = async (id: string, landlordId: string, payload: IPro
     return result;
 };
 
-const deletePropertyImage = async (id: string, landlordId: string) => {
+const deletePropertyImage = async (id: string, landlordId: string, role: string) => {
+    const where: any = { id };
+    if (role !== 'ADMIN') {
+        where.property = { landlordId };
+    }
     const image = await prisma.propertyImage.findFirstOrThrow({
-        where: { id, property: { landlordId } },
+        where,
         select: { deleteUrl: true }
     });
 
