@@ -59,7 +59,6 @@ enum PaymentStatus {
   EXPIRED
 }
 
-
 enum Currency {
   BDT
   USD

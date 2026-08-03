@@ -21,7 +21,7 @@ const createPropertySchema = z.object({
     status: z.nativeEnum(PropertyStatus).optional(),
     isFeatured: z.boolean().optional(),
     totalUnits: z.number().int().positive().optional(),
-    address: addressSchema,
+    address: addressSchema.optional(),
   }),
 });
 
@@ -64,6 +64,15 @@ const getAllPropertiesSchema = z.object({
     maxPrice: z.string().optional(),
     categoryId: z.string().uuid().optional(),
     amenities: z.string().optional(),
+    status: z.nativeEnum(PropertyStatus).optional(),
+    isFeatured: z.string().optional(),
+    availableNow: z.string().optional(),
+    bedrooms: z.string().optional(),
+    bathrooms: z.string().optional(),
+    rentType: z.string().optional(),
+    division: z.string().optional(),
+    district: z.string().optional(),
+    upazila: z.string().optional(),
   }),
 });
 const getLandlordPropertiesSchema = z.object({

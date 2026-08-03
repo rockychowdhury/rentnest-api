@@ -36,6 +36,15 @@ const paymentSelect: PaymentSelect = {
                             id: true,
                             title: true,
                         }
+                    },
+                    pricing: {
+                        select: {
+                            rentType: true,
+                            rentAmount: true,
+                            securityDeposit: true,
+                            currency: true,
+                            isActive: true
+                        }
                     }
                 }
             }
@@ -126,8 +135,8 @@ const initiatePayment = async (leaseId: string, tenantId: string) => {
                     mode: "payment",
                     customer: customerId,
                     payment_method_types: ["card"],
-                    success_url: `${config.app_url}/payment/checkout?success=true`,
-                    cancel_url: `${config.app_url}/payment/checkout?success=false`,
+                    success_url: `${config.app_url}/payment/success`,
+                    cancel_url: `${config.app_url}/payment/cancel`,
                     metadata: {
                         tenantId: user.id,
                         leaseId: lease.id,

@@ -12,14 +12,19 @@ const unitSelect: PropertyUnitSelect = {
     bedrooms: true,
     bathrooms: true,
     sizeSqft: true,
+    floor: true,
+    description: true,
     status: true,
     createdAt: true,
     updatedAt: true,
     pricing: {
         select: {
             id: true,
+            rentType: true,
             rentAmount: true,
-            securityDeposit: true
+            securityDeposit: true,
+            currency: true,
+            isActive: true
         }
     }
 };
@@ -59,13 +64,27 @@ const createPropertyUnit = async (propertyId: string, landlordId: string, payloa
         where: { id: propertyId, landlordId }
     });
 
-    const result = await prisma.propertyUnit.create({
-        data: {
-            propertyId,
-            ...payload
-        },
-        select: unitSelect
+    const result = await prisma.$transaction(async (tx) => {
+        const unit = await tx.propertyUnit.create({
+            data: {
+                propertyId,
+                ...payload
+            },
+            select: unitSelect
+        });
+
+        const activeUnitsCount = await tx.propertyUnit.count({
+            where: { propertyId, deletedAt: null }
+        });
+
+        await tx.property.update({
+            where: { id: propertyId },
+            data: { totalUnits: activeUnitsCount }
+        });
+
+        return unit;
     });
+
     return result;
 };
 
@@ -100,17 +119,36 @@ const updatePropertyUnitStatus = async (id: string, landlordId: string, role: st
 };
 
 const deletePropertyUnit = async (id: string, landlordId: string, role: string) => {
+    let targetUnit;
     if (role !== 'ADMIN') {
-        await prisma.propertyUnit.findFirstOrThrow({
+        targetUnit = await prisma.propertyUnit.findFirstOrThrow({
             where: { id, property: { landlordId } }
+        });
+    } else {
+        targetUnit = await prisma.propertyUnit.findUniqueOrThrow({
+            where: { id }
         });
     }
 
-    const result = await prisma.propertyUnit.update({
-        where: { id },
-        data: { deletedAt: new Date() },
-        select: { id: true, unitLabel: true, deletedAt: true }
+    const result = await prisma.$transaction(async (tx) => {
+        const deletedUnit = await tx.propertyUnit.update({
+            where: { id: targetUnit.id },
+            data: { deletedAt: new Date() },
+            select: { id: true, propertyId: true, unitLabel: true, deletedAt: true }
+        });
+
+        const activeUnitsCount = await tx.propertyUnit.count({
+            where: { propertyId: deletedUnit.propertyId, deletedAt: null }
+        });
+
+        await tx.property.update({
+            where: { id: deletedUnit.propertyId },
+            data: { totalUnits: activeUnitsCount }
+        });
+
+        return deletedUnit;
     });
+
     return result;
 };
 

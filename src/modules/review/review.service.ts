@@ -45,19 +45,106 @@ const getReviewsByPropertyId = async (propertyId: string, query?: IQuery) => {
     return { data, meta: { page, limit, total } };
 };
 
+const getAllReviewsAdmin = async (query?: IQuery) => {
+    const { page, limit, skip, take, orderBy } = calculatePagination(query);
+
+    const [data, total] = await Promise.all([
+        prisma.review.findMany({
+            skip,
+            take,
+            orderBy,
+            select: {
+                ...reviewSelect,
+                property: {
+                    select: {
+                        id: true,
+                        title: true
+                    }
+                }
+            }
+        }),
+        prisma.review.count()
+    ]);
+
+    return { data, meta: { page, limit, total } };
+};
+
+const getReviewsForLandlord = async (landlordId: string, query?: IQuery) => {
+    const { page, limit, skip, take, orderBy } = calculatePagination(query);
+
+    const where = { property: { landlordId } };
+
+    const [data, total] = await Promise.all([
+        prisma.review.findMany({
+            where,
+            skip,
+            take,
+            orderBy,
+            select: {
+                ...reviewSelect,
+                property: {
+                    select: {
+                        id: true,
+                        title: true
+                    }
+                }
+            }
+        }),
+        prisma.review.count({ where })
+    ]);
+
+    return { data, meta: { page, limit, total } };
+};
+
+const getReviewsForTenant = async (tenantId: string, query?: IQuery) => {
+    const { page, limit, skip, take, orderBy } = calculatePagination(query);
+
+    const where = { tenantId };
+
+    const [data, total] = await Promise.all([
+        prisma.review.findMany({
+            where,
+            skip,
+            take,
+            orderBy,
+            select: {
+                ...reviewSelect,
+                property: {
+                    select: {
+                        id: true,
+                        title: true,
+                        images: {
+                            select: {
+                                id: true,
+                                url: true,
+                                isCover: true
+                            }
+                        }
+                    }
+                }
+            }
+        }),
+        prisma.review.count({ where })
+    ]);
+
+    return { data, meta: { page, limit, total } };
+};
+
 const createReview = async (tenantId: string, payload: IReviewCreatePayload) => {
     const {leaseId, propertyId} = payload;
-    const lease = await prisma.lease.findFirstOrThrow({
-        where: {
-            id: leaseId,
-            tenantId,
-            propertyUnit: {
-                propertyId
+    if (leaseId) {
+        const lease = await prisma.lease.findFirstOrThrow({
+            where: {
+                id: leaseId,
+                tenantId,
+                propertyUnit: {
+                    propertyId
+                }
             }
+        });
+        if (lease.status !== LeaseStatus.COMPLETED && lease.status !== LeaseStatus.TERMINATED) {
+            throw new Error("Your lease status must be Completed or Terminated to leave a review.");
         }
-    });
-    if(lease.status !== LeaseStatus.COMPLETED){
-        throw new Error ("Your lease status is not Completed Yet.")
     }
 
     const result = await prisma.review.create({
@@ -116,8 +203,11 @@ const respondToReview = async (id: string, landlordId: string, payload: IReviewR
 
 export const reviewService = {
     getReviewsByPropertyId,
+    getAllReviewsAdmin,
+    getReviewsForLandlord,
+    getReviewsForTenant,
     createReview,
     updateReview,
     deleteReview,
     respondToReview
-};
+}

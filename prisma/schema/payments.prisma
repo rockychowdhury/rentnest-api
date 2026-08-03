@@ -1,15 +1,15 @@
 model Payment {
-  id       String  @id @default(uuid()) @db.Uuid
-  tenantId String  @map("payer_id") @db.Uuid
-  leaseId  String? @map("lease_id") @db.Uuid
-  landlordId String @map("landlord_id") @db.Uuid
+  id         String  @id @default(uuid()) @db.Uuid
+  tenantId   String  @map("payer_id") @db.Uuid
+  leaseId    String? @map("lease_id") @db.Uuid
+  landlordId String  @map("landlord_id") @db.Uuid
 
   amount   Decimal       @db.Decimal(10, 2)
   currency Currency      @default(BDT)
   status   PaymentStatus @default(PENDING)
 
   stripeCustomerId  String  @map("stripe_customer_id")
-  checkoutSessionId String?  @unique
+  checkoutSessionId String? @unique
   transactionId     String? @unique @map("transaction_id") @db.VarChar(255)
   failureReason     String?
 

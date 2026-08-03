@@ -15,6 +15,17 @@ const getAllProperties = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getAllPropertiesAdmin = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyService.getAllPropertiesAdmin(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "All properties retrieved successfully (Admin)",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
 const getFeaturedProperties = catchAsync(async (req: Request, res: Response) => {
     const result = await propertyService.getFeaturedProperties();
     sendResponse(res, {
@@ -27,7 +38,7 @@ const getFeaturedProperties = catchAsync(async (req: Request, res: Response) => 
 
 const getLandlordProperties = catchAsync(async (req: Request, res: Response) => {
     const { landlordId } = req.params;
-    const result = await propertyService.getMyProperties(landlordId as string, req.query);
+    const result = await propertyService.getLandlordProperties(landlordId as string, req.query);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -142,6 +153,7 @@ const restoreProperty = catchAsync(async (req: Request, res: Response) => {
 
 export const propertyController = {
     getAllProperties,
+    getAllPropertiesAdmin,
     getFeaturedProperties,
     getLandlordProperties,
     getMyProperties,

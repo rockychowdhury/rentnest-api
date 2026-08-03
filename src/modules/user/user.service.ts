@@ -20,6 +20,8 @@ const userSelect: UserSelect = {
             userId: true,
             fullName: true,
             bio: true,
+            gender:true,
+            occupation:true,
             avatarUrl: true,
             createdAt: true,
             updatedAt: true

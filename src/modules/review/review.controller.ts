@@ -16,6 +16,29 @@ const getReviewsByPropertyId = catchAsync(async (req: Request, res: Response) =>
     });
 });
 
+const getAllReviewsAdmin = catchAsync(async (req: Request, res: Response) => {
+    const result = await reviewService.getAllReviewsAdmin(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "All reviews retrieved successfully (Admin)",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
+const getReviewsForLandlord = catchAsync(async (req: Request, res: Response) => {
+    const landlordId = req.user?.id as string;
+    const result = await reviewService.getReviewsForLandlord(landlordId, req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Landlord reviews retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
 const createReview = catchAsync(async (req: Request, res: Response) => {
     const tenantId = req.user?.id as string;
     const payload = req.body;
@@ -67,8 +90,23 @@ const respondToReview = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getMyReviews = catchAsync(async (req: Request, res: Response) => {
+    const tenantId = req.user?.id as string;
+    const result = await reviewService.getReviewsForTenant(tenantId, req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Tenant reviews retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
 export const reviewController = {
     getReviewsByPropertyId,
+    getAllReviewsAdmin,
+    getReviewsForLandlord,
+    getMyReviews,
     createReview,
     updateReview,
     deleteReview,

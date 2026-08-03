@@ -38,11 +38,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.status(status.OK).send(
         {
             message: "Server is Healthy",
-            from: "RentNest API",
+            from: "RentNest REST API SERVICE",
             author: "Rocky Chowdhury",
             time: new Date(),
         }

@@ -30,7 +30,14 @@ const leaseSelect: LeaseSelect = {
             property: {
                 select: {
                     id: true,
-                    title: true
+                    title: true,
+                    images: {
+                        select: {
+                            id: true,
+                            url: true,
+                            isCover: true
+                        }
+                    }
                 }
             }
         }

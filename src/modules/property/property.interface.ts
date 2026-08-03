@@ -11,7 +11,7 @@ export interface IAddressCreatePayload {
 
 export interface IPropertyCreatePayload {
   categoryId: string;
-  address: IAddressCreatePayload;
+  address?: IAddressCreatePayload;
   title: string;
   description: string;
 }
@@ -21,6 +21,7 @@ export interface IPropertyUpdatePayload {
   title?: string;
   description?: string;
   isFeatured?: boolean;
+  address?: Partial<IAddressCreatePayload>;
 }
 
 

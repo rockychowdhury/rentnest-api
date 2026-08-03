@@ -8,6 +8,7 @@ import { PropertyValidation } from "./property.validation";
 const router = Router();
 
 router.get("/", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getAllProperties);
+router.get("/admin/all", auth(UserRole.ADMIN), propertyController.getAllPropertiesAdmin);
 router.get("/featured", propertyController.getFeaturedProperties);
 router.get("/landlord/:landlordId", validateRequest(PropertyValidation.getLandlordPropertiesSchema), propertyController.getLandlordProperties);
 router.get("/my-properties", auth(UserRole.LANDLORD), validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getMyProperties);
