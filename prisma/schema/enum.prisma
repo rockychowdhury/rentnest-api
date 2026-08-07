@@ -59,6 +59,13 @@ enum PaymentStatus {
   EXPIRED
 }
 
+enum PaymentType {
+  RENT
+  SECURITY
+  UTILITY
+  OTHER
+}
+
 enum Currency {
   BDT
   USD

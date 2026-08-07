@@ -1,7 +1,6 @@
 model Division {
-  id     Int     @id @default(autoincrement())
-  name   String  @db.VarChar(255)
-  bnName String? @map("bn_name") @db.VarChar(255)
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(255)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -12,24 +11,22 @@ model Division {
 }
 
 model District {
-  id         Int       @id @default(autoincrement())
-  name       String    @db.VarChar(255)
-  bnName     String?   @map("bn_name") @db.VarChar(255)
-  divisionId Int       @map("division_id")
-  division   Division  @relation(fields: [divisionId], references: [id])
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  upazilas   Upazila[]
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(255)
+  divisionId Int      @map("division_id")
+  division   Division @relation(fields: [divisionId], references: [id])
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  areas      Area[]
 
   @@index([divisionId])
   @@index([name])
   @@map("districts")
 }
 
-model Upazila {
+model Area {
   id         Int      @id @default(autoincrement())
   name       String   @db.VarChar(255)
-  bn_name    String?  @map("bn_name") @db.VarChar(255)
   districtId Int      @map("division_id")
   district   District @relation(fields: [districtId], references: [id])
 
@@ -39,7 +36,7 @@ model Upazila {
 
   @@index([districtId])
   @@index([name])
-  @@map("upazilas")
+  @@map("areas")
 }
 
 model Address {
@@ -49,8 +46,8 @@ model Address {
   addressLine2  String?  @map("address_line2")
   landmark      String?  @db.VarChar(255)
   postalCode    String   @map("postal_code") @db.VarChar(20)
-  upazilaId     Int      @map("upazila_id")
-  upazila       Upazila  @relation(fields: [upazilaId], references: [id])
+  areaId        Int      @map("area_id")
+  area          Area     @relation(fields: [areaId], references: [id])
   latitude      Decimal? @db.Decimal(11, 8)
   longitude     Decimal? @db.Decimal(11, 8)
   createdAt     DateTime @default(now()) @map("created_at")
@@ -58,6 +55,6 @@ model Address {
 
   property Property?
 
-  @@index([upazilaId])
+  @@index([areaId])
   @@map("addresses")
 }

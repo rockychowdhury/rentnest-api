@@ -1,0 +1,35 @@
+model Amenity {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(255)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  properties PropertyAmenity[]
+  units      PropertyUnitAmenity[]
+
+  @@map("amenities")
+}
+
+model PropertyAmenity {
+  propertyId String @map("property_id") @db.Uuid
+  amenityId  String @map("amenity_id") @db.Uuid
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  amenity  Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, amenityId])
+  @@index([amenityId])
+  @@map("property_amenities")
+}
+
+model PropertyUnitAmenity {
+  unitId    String @map("unit_id") @db.Uuid
+  amenityId String @map("amenity_id") @db.Uuid
+
+  unit    PropertyUnit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  amenity Amenity      @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@id([unitId, amenityId])
+  @@index([amenityId])
+  @@map("property_unit_amenities")
+}

@@ -1,0 +1,20 @@
+model Pricing {
+  id              String   @id @default(uuid()) @db.Uuid
+  propertyUnitId  String   @map("property_unit_id") @db.Uuid
+  rentType        RentType @map("rent_type")
+  rentAmount      Decimal  @map("rent_amount") @db.Decimal(10, 2)
+  securityDeposit Decimal? @default(0) @map("security_deposit") @db.Decimal(10, 2)
+  utilityBill     Decimal? @default(0) @map("utility_bill") @db.Decimal(10, 2)
+  utilityPolicy   String?  @map("utility_policy") @db.VarChar(255)
+  currency        Currency @default(BDT)
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  propertyUnit   PropertyUnit    @relation(fields: [propertyUnitId], references: [id])
+  rentalRequests RentalRequest[]
+
+  @@unique([propertyUnitId, rentType])
+  @@index([propertyUnitId])
+  @@map("pricing")
+}

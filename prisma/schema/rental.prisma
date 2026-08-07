@@ -37,6 +37,7 @@ model Lease {
   currency        Currency    @default(BDT)
   startDate       DateTime    @map("start_date") @db.Date
   endDate         DateTime?   @map("end_date") @db.Date
+  paidTill        DateTime?   @map("paid_till")
   status          LeaseStatus @default(PENDING_PAYMENT)
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
