@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync"
 import { userService } from "./user.service";
 import { sendResponse } from "../../utils/sendResponse";
 import status from "http-status";
+import { authService } from "../auth/auth.service";
 
 
 
@@ -12,11 +13,30 @@ const createUser = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
         const payload = req.body;
         const user = await userService.createUser(payload);
+        const loginPayload = {
+            email:user?.email!,
+            password:payload.password
+        }
+        const {accessToken,refreshToken} = await authService.login(loginPayload);
+
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "none",
+            maxAge: 24 * 60 * 60 * 1000
+        });
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+        
         sendResponse(res, {
             success: true,
             statusCode: status.CREATED,
             message: "User Created Successfully",
-            data: { user }
+            data: { user, accessToken,refreshToken }
         });
     }
 )
