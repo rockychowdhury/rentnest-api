@@ -2,10 +2,12 @@ import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import status from "http-status";
-import { propertyService } from "./property.service";
-
+import { propertyCoreService } from "./property.core.service";
+import { propertyQueryService } from "./property.query.service";
+import { propertyVerificationService } from "./property.verification.service";
+import { propertyAmenityService } from "./property.amenity.service";
 const getAllProperties = catchAsync(async (req: Request, res: Response) => {
-    const result = await propertyService.getAllProperties(req.query);
+    const result = await propertyQueryService.getAllProperties(req.query);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -16,7 +18,7 @@ const getAllProperties = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllPropertiesAdmin = catchAsync(async (req: Request, res: Response) => {
-    const result = await propertyService.getAllPropertiesAdmin(req.query);
+    const result = await propertyQueryService.getAllPropertiesAdmin(req.query);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -27,7 +29,7 @@ const getAllPropertiesAdmin = catchAsync(async (req: Request, res: Response) => 
 });
 
 const getFeaturedProperties = catchAsync(async (req: Request, res: Response) => {
-    const result = await propertyService.getFeaturedProperties();
+    const result = await propertyQueryService.getFeaturedProperties();
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -38,7 +40,7 @@ const getFeaturedProperties = catchAsync(async (req: Request, res: Response) => 
 
 const getLandlordProperties = catchAsync(async (req: Request, res: Response) => {
     const { landlordId } = req.params;
-    const result = await propertyService.getLandlordProperties(landlordId as string, req.query);
+    const result = await propertyQueryService.getLandlordProperties(landlordId as string, req.query);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -50,7 +52,7 @@ const getLandlordProperties = catchAsync(async (req: Request, res: Response) => 
 
 const getMyProperties = catchAsync(async (req: Request, res: Response) => {
     const userId = req.user?.id as string;
-    const result = await propertyService.getMyProperties(userId, req.query);
+    const result = await propertyQueryService.getMyProperties(userId, req.query);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -62,7 +64,7 @@ const getMyProperties = catchAsync(async (req: Request, res: Response) => {
 
 const getPropertyById = catchAsync(async (req: Request, res: Response) => {
     const { propertyId } = req.params;
-    const result = await propertyService.getPropertyById(propertyId as string);
+    const result = await propertyCoreService.getPropertyById(propertyId as string);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -74,7 +76,7 @@ const getPropertyById = catchAsync(async (req: Request, res: Response) => {
 const createProperty = catchAsync(async (req: Request, res: Response) => {
     const userId = req.user?.id as string;
     const payload = req.body;
-    const result = await propertyService.createProperty(userId, payload);
+    const result = await propertyCoreService.createProperty(userId, payload);
     sendResponse(res, {
         statusCode: status.CREATED,
         success: true,
@@ -88,7 +90,7 @@ const updateProperty = catchAsync(async (req: Request, res: Response) => {
     const userId = req.user?.id as string;
     const role = req.user?.role as string;
     const payload = req.body;
-    const result = await propertyService.updateProperty(propertyId as string, userId, role, payload);
+    const result = await propertyCoreService.updateProperty(propertyId as string, userId, role, payload);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -102,7 +104,7 @@ const updatePropertyStatus = catchAsync(async (req: Request, res: Response) => {
     const userId = req.user?.id as string;
     const role = req.user?.role as string;
     const payload = req.body;
-    const result = await propertyService.updatePropertyStatus(propertyId as string, userId, role, payload);
+    const result = await propertyVerificationService.updatePropertyStatus(propertyId as string, userId, role, payload);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -116,7 +118,7 @@ const setPropertyAmenities = catchAsync(async (req: Request, res: Response) => {
     const userId = req.user?.id as string;
     const role = req.user?.role as string;
     const payload = req.body;
-    const result = await propertyService.setPropertyAmenities(propertyId as string, userId, role, payload);
+    const result = await propertyAmenityService.setPropertyAmenities(propertyId as string, userId, role, payload);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -129,7 +131,7 @@ const deleteProperty = catchAsync(async (req: Request, res: Response) => {
     const { propertyId } = req.params;
     const userId = req.user?.id as string;
     const role = req.user?.role as string;
-    const result = await propertyService.deleteProperty(propertyId as string, userId, role);
+    const result = await propertyCoreService.deleteProperty(propertyId as string, userId, role);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -142,11 +144,56 @@ const restoreProperty = catchAsync(async (req: Request, res: Response) => {
     const { propertyId } = req.params;
     const userId = req.user?.id as string;
     const role = req.user?.role as string;
-    const result = await propertyService.restoreProperty(propertyId as string, userId, role);
+    const result = await propertyCoreService.restoreProperty(propertyId as string, userId, role);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
         message: "Property restored successfully",
+        data: result
+    });
+});
+
+const requestVerification = catchAsync(async (req: Request, res: Response) => {
+    const { propertyId } = req.params;
+    const userId = req.user?.id as string;
+    const result = await propertyVerificationService.requestVerification(propertyId as string, userId);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Property submitted for verification successfully",
+        data: result
+    });
+});
+
+const getVerificationQueue = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyVerificationService.getVerificationQueue(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Verification queue retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
+const verifyProperty = catchAsync(async (req: Request, res: Response) => {
+    const { propertyId } = req.params;
+    const result = await propertyVerificationService.verifyProperty(propertyId as string);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Property verified successfully",
+        data: result
+    });
+});
+
+const rejectProperty = catchAsync(async (req: Request, res: Response) => {
+    const { propertyId } = req.params;
+    const result = await propertyVerificationService.rejectProperty(propertyId as string);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Property rejected successfully",
         data: result
     });
 });
@@ -163,5 +210,9 @@ export const propertyController = {
     updatePropertyStatus,
     setPropertyAmenities,
     deleteProperty,
-    restoreProperty
+    restoreProperty,
+    requestVerification,
+    getVerificationQueue,
+    verifyProperty,
+    rejectProperty
 };

@@ -4,14 +4,13 @@ export interface IAddressCreatePayload {
   addressLine2?: string;
   landmark?: string;
   postalCode: string;
-  upazilaId: number;
+  areaId: number;
   latitude?: number;
   longitude?: number;
 }
 
 export interface IPropertyCreatePayload {
   categoryId: string;
-  address?: IAddressCreatePayload;
   title: string;
   description: string;
 }
@@ -20,7 +19,6 @@ export interface IPropertyUpdatePayload {
   categoryId?: string;
   title?: string;
   description?: string;
-  isFeatured?: boolean;
   address?: Partial<IAddressCreatePayload>;
 }
 

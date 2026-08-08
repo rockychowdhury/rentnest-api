@@ -8,7 +8,7 @@ const addressSchema = z.object({
   addressLine2: z.string().optional(),
   landmark: z.string().max(255).optional(),
   postalCode: z.string().min(1, 'Postal code is required').max(20),
-  upazilaId: z.number().int().positive('Upazila ID is required'),
+  areaId: z.number().int().positive('Area ID is required'),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
 });
@@ -18,11 +18,8 @@ const createPropertySchema = z.object({
     categoryId: z.string().uuid('Valid Category ID is required'),
     title: z.string().min(1, 'Title is required').max(255),
     description: z.string().min(1, 'Description is required'),
-    status: z.nativeEnum(PropertyStatus).optional(),
-    isFeatured: z.boolean().optional(),
-    totalUnits: z.number().int().positive().optional(),
     address: addressSchema.optional(),
-  }),
+  }).strict(),
 });
 
 const updatePropertySchema = z.object({
@@ -33,10 +30,8 @@ const updatePropertySchema = z.object({
     categoryId: z.string().uuid().optional(),
     title: z.string().max(255).optional(),
     description: z.string().optional(),
-    isFeatured: z.boolean().optional(),
-    totalUnits: z.number().int().positive().optional(),
     address: addressSchema.partial().optional(),
-  }),
+  }).strict(),
 });
 
 const updatePropertyStatusSchema = z.object({
@@ -44,8 +39,14 @@ const updatePropertyStatusSchema = z.object({
     propertyId: z.string().uuid("Invalid Property ID in URL"),
   }),
   body: z.object({
-    status: z.nativeEnum(PropertyStatus),
-  }),
+    status: z.literal(PropertyStatus.INACTIVE),
+  }).strict(),
+});
+
+const requestVerificationSchema = z.object({
+  params: z.object({
+    propertyId: z.string().uuid("Invalid Property ID in URL"),
+  })
 });
 
 const setPropertyAmenitiesSchema = z.object({
@@ -59,20 +60,19 @@ const setPropertyAmenitiesSchema = z.object({
 
 const getAllPropertiesSchema = z.object({
   query: paginationQuerySchema.extend({
-    location: z.string().optional(),
     minPrice: z.string().optional(),
     maxPrice: z.string().optional(),
     categoryId: z.string().uuid().optional(),
     amenities: z.string().optional(),
     status: z.nativeEnum(PropertyStatus).optional(),
-    isFeatured: z.string().optional(),
-    availableNow: z.string().optional(),
+    isFeatured: z.boolean().optional(),
+    timeFilter: z.enum(['today', 'this-month']).optional(),
     bedrooms: z.string().optional(),
     bathrooms: z.string().optional(),
     rentType: z.string().optional(),
-    division: z.string().optional(),
-    district: z.string().optional(),
-    upazila: z.string().optional(),
+    divisionId: z.string().optional(),
+    districtId: z.string().optional(),
+    areaId: z.string().optional(),
   }),
 });
 const getLandlordPropertiesSchema = z.object({
@@ -85,6 +85,7 @@ export const PropertyValidation = {
   createPropertySchema,
   updatePropertySchema,
   updatePropertyStatusSchema,
+  requestVerificationSchema,
   setPropertyAmenitiesSchema,
   getAllPropertiesSchema,
   getLandlordPropertiesSchema,
