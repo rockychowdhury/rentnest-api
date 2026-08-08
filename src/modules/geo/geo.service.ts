@@ -1,23 +1,20 @@
 import { prisma } from "../../lib/prisma";
-import { DivisionSelect, DistrictSelect, UpazilaSelect } from "../../../generated/prisma/models";
+import { DivisionSelect, DistrictSelect, AreaSelect } from "../../../generated/prisma/models";
 
 const divisionSelect: DivisionSelect = {
     id: true,
     name: true,
-    bnName: true,
 };
 
 const districtSelect: DistrictSelect = {
     id: true,
     name: true,
-    bnName: true,
     divisionId: true,
 };
 
-const upazilaSelect: UpazilaSelect = {
+const areaSelect: AreaSelect = {
     id: true,
     name: true,
-    bn_name: true,
     districtId: true,
 };
 
@@ -50,10 +47,10 @@ const getDistrictById = async (id: number) => {
     return result;
 };
 
-const getUpazilasByDistrict = async (districtId: number) => {
-    const result = await prisma.upazila.findMany({
+const getAreasByDistrict = async (districtId: number) => {
+    const result = await prisma.area.findMany({
         where: { districtId },
-        select: upazilaSelect,
+        select: areaSelect,
         orderBy: {
             name: 'asc'
         }
@@ -61,11 +58,11 @@ const getUpazilasByDistrict = async (districtId: number) => {
     return result;
 };
 
-const getUpazilaById = async (id: number) => {
-    const result = await prisma.upazila.findUniqueOrThrow({
+const getAreaById = async (id: number) => {
+    const result = await prisma.area.findUniqueOrThrow({
         where: { id },
         select: {
-            ...upazilaSelect,
+            ...areaSelect,
             district: {
                 select: {
                     ...districtSelect,
@@ -79,25 +76,20 @@ const getUpazilaById = async (id: number) => {
     return result;
 };
 
-const searchUpazilas = async (query: string) => {
-    const result = await prisma.upazila.findMany({
+const searchAreas = async (query: string) => {
+    const result = await prisma.area.findMany({
         where: query ? {
-            OR: [
-                { name: { contains: query, mode: "insensitive" } },
-                { bn_name: { contains: query, mode: "insensitive" } }
-            ]
+            name: { contains: query, mode: "insensitive" }
         } : undefined,
         take: 50,
         select: {
-            ...upazilaSelect,
+            ...areaSelect,
             district: {
                 select: {
                     name: true,
-                    bnName: true,
                     division: {
                         select: {
                             name: true,
-                            bnName: true
                         }
                     }
                 }
@@ -113,7 +105,8 @@ export const geoService = {
     getAllDivisions,
     getDistrictsByDivision,
     getDistrictById,
-    getUpazilasByDistrict,
-    getUpazilaById,
-    searchUpazilas
+    getAreasByDistrict,
+    getAreaById,
+    searchAreas
 };
+

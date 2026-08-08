@@ -36,35 +36,35 @@ const getDistrictById = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const getUpazilasByDistrict = catchAsync(async (req: Request, res: Response) => {
+const getAreasByDistrict = catchAsync(async (req: Request, res: Response) => {
     const { districtId } = req.params;
-    const result = await geoService.getUpazilasByDistrict(Number(districtId as string));
+    const result = await geoService.getAreasByDistrict(Number(districtId as string));
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: "Upazilas retrieved successfully",
+        message: "Areas retrieved successfully",
         data: result
     });
 });
 
-const getUpazilaById = catchAsync(async (req: Request, res: Response) => {
-    const { upazilaId } = req.params;
-    const result = await geoService.getUpazilaById(Number(upazilaId as string));
+const getAreaById = catchAsync(async (req: Request, res: Response) => {
+    const { areaId } = req.params;
+    const result = await geoService.getAreaById(Number(areaId as string));
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: "Upazila retrieved successfully",
+        message: "Area retrieved successfully",
         data: result
     });
 });
 
-const searchUpazilas = catchAsync(async (req: Request, res: Response) => {
+const searchAreas = catchAsync(async (req: Request, res: Response) => {
     const { q } = req.query;
-    const result = await geoService.searchUpazilas(q as string);
+    const result = await geoService.searchAreas(q as string);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: "Upazilas searched successfully",
+        message: "Areas searched successfully",
         data: result
     });
 });
@@ -72,7 +72,7 @@ export const geoController = {
     getAllDivisions,
     getDistrictsByDivision,
     getDistrictById,
-    getUpazilasByDistrict,
-    getUpazilaById,
-    searchUpazilas
+    getAreasByDistrict,
+    getAreaById,
+    searchAreas
 };
