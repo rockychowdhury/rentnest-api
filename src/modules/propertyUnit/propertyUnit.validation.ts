@@ -46,10 +46,20 @@ const getUnitsByPropertyIdSchema = z.object({
 });
 const getPropertyUnitByIdSchema = uuidParamSchema('propertyUnitId');
 
+const setUnitAmenitiesSchema = z.object({
+  params: z.object({
+    propertyUnitId: z.string().uuid("Invalid Property Unit ID in URL"),
+  }),
+  body: z.object({
+    amenityIds: z.array(z.string().uuid('Valid Amenity ID is required')),
+  }).strict(),
+});
+
 export const PropertyUnitValidation = {
   createPropertyUnitSchema,
   updatePropertyUnitSchema,
   updatePropertyUnitStatusSchema,
   getUnitsByPropertyIdSchema,
   getPropertyUnitByIdSchema,
+  setUnitAmenitiesSchema,
 };

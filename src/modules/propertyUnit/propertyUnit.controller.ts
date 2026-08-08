@@ -92,6 +92,20 @@ const getPropertyUnitAvailability = catchAsync(async (req: Request, res: Respons
     });
 });
 
+const setUnitAmenities = catchAsync(async (req: Request, res: Response) => {
+    const { propertyUnitId } = req.params;
+    const landlordId = req.user?.id as string;
+    const role = req.user?.role as string;
+    const payload = req.body;
+    const result = await propertyUnitService.setUnitAmenities(propertyUnitId as string, landlordId, role, payload);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Property unit amenities updated successfully",
+        data: result
+    });
+});
+
 export const propertyUnitController = {
     getUnitsByPropertyId,
     getPropertyUnitById,
@@ -99,5 +113,6 @@ export const propertyUnitController = {
     updatePropertyUnit,
     updatePropertyUnitStatus,
     deletePropertyUnit,
-    getPropertyUnitAvailability
+    getPropertyUnitAvailability,
+    setUnitAmenities
 };

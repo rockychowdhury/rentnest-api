@@ -26,6 +26,16 @@ const unitSelect: PropertyUnitSelect = {
             currency: true,
             isActive: true
         }
+    },
+    amenities: {
+        select: {
+            amenity: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            }
+        }
     }
 };
 
@@ -71,15 +81,6 @@ const createPropertyUnit = async (propertyId: string, landlordId: string, payloa
                 ...payload
             },
             select: unitSelect
-        });
-
-        const activeUnitsCount = await tx.propertyUnit.count({
-            where: { propertyId, deletedAt: null }
-        });
-
-        await tx.property.update({
-            where: { id: propertyId },
-            data: { totalUnits: activeUnitsCount }
         });
 
         return unit;
@@ -137,15 +138,6 @@ const deletePropertyUnit = async (id: string, landlordId: string, role: string) 
             select: { id: true, propertyId: true, unitLabel: true, deletedAt: true }
         });
 
-        const activeUnitsCount = await tx.propertyUnit.count({
-            where: { propertyId: deletedUnit.propertyId, deletedAt: null }
-        });
-
-        await tx.property.update({
-            where: { id: deletedUnit.propertyId },
-            data: { totalUnits: activeUnitsCount }
-        });
-
         return deletedUnit;
     });
 
@@ -169,6 +161,36 @@ const getPropertyUnitAvailability = async (id: string) => {
     };
 };
 
+const setUnitAmenities = async (id: string, landlordId: string, role: string, payload: { amenityIds: string[] }) => {
+    if (role !== 'ADMIN') {
+        await prisma.propertyUnit.findFirstOrThrow({ 
+            where: { id, property: { landlordId } } 
+        });
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+        await tx.propertyUnitAmenity.deleteMany({
+            where: { unitId: id }
+        });
+
+        if (payload.amenityIds && payload.amenityIds.length > 0) {
+            await tx.propertyUnitAmenity.createMany({
+                data: payload.amenityIds.map(amenityId => ({
+                    unitId: id,
+                    amenityId
+                }))
+            });
+        }
+
+        return tx.propertyUnit.findUnique({
+            where: { id },
+            select: unitSelect
+        });
+    });
+
+    return result;
+};
+
 export const propertyUnitService = {
     getUnitsByPropertyId,
     getPropertyUnitById,
@@ -176,5 +198,6 @@ export const propertyUnitService = {
     updatePropertyUnit,
     updatePropertyUnitStatus,
     deletePropertyUnit,
-    getPropertyUnitAvailability
+    getPropertyUnitAvailability,
+    setUnitAmenities
 };

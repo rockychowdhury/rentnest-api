@@ -12,6 +12,7 @@ router.get("/:propertyUnitId", validateRequest(PropertyUnitValidation.getPropert
 router.post("/property/:propertyId", auth(UserRole.LANDLORD), validateRequest(PropertyUnitValidation.createPropertyUnitSchema), propertyUnitController.createPropertyUnit);
 router.patch("/:propertyUnitId", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyUnitValidation.updatePropertyUnitSchema), propertyUnitController.updatePropertyUnit);
 router.patch("/:propertyUnitId/status", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyUnitValidation.updatePropertyUnitStatusSchema), propertyUnitController.updatePropertyUnitStatus);
+router.patch("/:propertyUnitId/amenities", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyUnitValidation.setUnitAmenitiesSchema), propertyUnitController.setUnitAmenities);
 router.delete("/:propertyUnitId", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyUnitValidation.getPropertyUnitByIdSchema), propertyUnitController.deletePropertyUnit);
 router.get("/:propertyUnitId/availability", validateRequest(PropertyUnitValidation.getPropertyUnitByIdSchema), propertyUnitController.getPropertyUnitAvailability);
 

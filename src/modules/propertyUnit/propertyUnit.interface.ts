@@ -17,3 +17,7 @@ export interface IPropertyUnitUpdatePayload {
 export interface IPropertyUnitStatusUpdatePayload {
     status: PropertyUnitStatus;
 }
+
+export interface IPropertyUnitAmenitiesSetPayload {
+    amenityIds: string[];
+}
