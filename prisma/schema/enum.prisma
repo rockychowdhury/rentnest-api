@@ -18,8 +18,11 @@ enum Gender {
 
 enum PropertyStatus {
   DRAFT
-  PUBLISHED
+  PENDING_VERIFICATION
+  VERIFIED
+  REJECTED
   INACTIVE
+  ARCHIVED
 }
 
 enum PropertyUnitStatus {

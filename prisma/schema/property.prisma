@@ -1,6 +1,6 @@
 model Property {
   id          String         @id @default(uuid()) @db.Uuid
-  slug        String         @db.VarChar(255)
+  slug        String         @unique @db.VarChar(255)
   landlordId  String         @map("landlord_id") @db.Uuid
   categoryId  String         @map("category_id") @db.Uuid
   addressId   Int?           @unique @map("address_id")
@@ -19,10 +19,13 @@ model Property {
   images    PropertyImage[]
   amenities PropertyAmenity[]
   reviews   Review[]
+  verificationQueue PropertyVerificationQueue?
 
   @@index([landlordId])
   @@index([categoryId])
   @@index([status])
+  @@index([slug])
+  @@index([createdAt])
   @@map("properties")
 }
 
@@ -50,4 +53,13 @@ model PropertyUnit {
   @@index([propertyId])
   @@index([status])
   @@map("property_units")
+}
+
+model PropertyVerificationQueue {
+  id         String   @id @default(uuid()) @db.Uuid
+  propertyId String   @unique @map("property_id") @db.Uuid
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("property_verification_queue")
 }
