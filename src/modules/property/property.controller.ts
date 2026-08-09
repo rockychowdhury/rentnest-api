@@ -140,6 +140,19 @@ const deleteProperty = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const makePropertyInactive = catchAsync(async (req: Request, res: Response) => {
+    const { propertyId } = req.params;
+    const userId = req.user?.id as string;
+    const role = req.user?.role as string;
+    const result = await propertyCoreService.makePropertyInactive(propertyId as string, userId, role);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Property made inactive successfully",
+        data: result
+    });
+});
+
 const restoreProperty = catchAsync(async (req: Request, res: Response) => {
     const { propertyId } = req.params;
     const userId = req.user?.id as string;
@@ -210,6 +223,7 @@ export const propertyController = {
     updatePropertyStatus,
     setPropertyAmenities,
     deleteProperty,
+    makePropertyInactive,
     restoreProperty,
     requestVerification,
     getVerificationQueue,

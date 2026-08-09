@@ -1,8 +1,8 @@
 import { prisma } from "../../lib/prisma";
 import { calculatePagination } from "../../utils/calculatePagination";
 import { IQuery } from "../../types";
-import { PropertyStatus } from "../../../generated/prisma/enums";
-import { PricingWhereInput, PropertyWhereInput } from "../../../generated/prisma/models";
+import { PropertyStatus, PropertyUnitStatus } from "../../../generated/prisma/enums";
+import { PricingWhereInput, PropertyUnitWhereInput, PropertyWhereInput } from "../../../generated/prisma/models";
 import { propertySelect, publicPropertySelect, formatPublicProperty } from "./property.constants";
 
 const getAllProperties = async (query: IQuery) => {
@@ -11,7 +11,7 @@ const getAllProperties = async (query: IQuery) => {
 
     const andConditions: PropertyWhereInput[] = [
         { deletedAt: null },
-        { status: PropertyStatus.VERIFIED }
+        { status: PropertyStatus.ACTIVE }
     ];
 
     if (isFeatured === true) {
@@ -63,8 +63,8 @@ const getAllProperties = async (query: IQuery) => {
     }
 
     // Always filter properties that have at least one available unit matching the criteria
-    const unitConditions: any = { deletedAt: null, status: 'AVAILABLE' };
-    const unitAndConditions: any[] = [];
+    const unitConditions: PropertyUnitWhereInput = { deletedAt: null, status: PropertyUnitStatus.AVAILABLE };
+    const unitAndConditions: PropertyUnitWhereInput[] = [];
 
     if (bedrooms) {
         unitConditions.bedrooms = { gte: Number(bedrooms) };
@@ -175,7 +175,7 @@ const getAllPropertiesAdmin = async (query: IQuery) => {
 
 const getFeaturedProperties = async () => {
     const result = await prisma.property.findMany({
-        where: { isFeatured: true, status: PropertyStatus.VERIFIED, deletedAt: null },
+        where: { isFeatured: true, status: PropertyStatus.ACTIVE, deletedAt: null },
         take: 10,
         select: publicPropertySelect,
         orderBy: { createdAt: 'desc' }
@@ -188,14 +188,14 @@ const getLandlordProperties = async (landlordId: string, query: IQuery) => {
 
     const [data, total] = await Promise.all([
         prisma.property.findMany({
-            where: { landlordId, status: PropertyStatus.VERIFIED, deletedAt: null },
+            where: { landlordId, status: PropertyStatus.ACTIVE, deletedAt: null },
             skip,
             take,
             orderBy,
             select: propertySelect
         }),
         prisma.property.count({
-            where: { landlordId, status: PropertyStatus.VERIFIED, deletedAt: null }
+            where: { landlordId, status: PropertyStatus.ACTIVE, deletedAt: null }
         })
     ]);
 
@@ -210,7 +210,9 @@ const getMyProperties = async (landlordId: string, query: IQuery) => {
     const { status, categoryId } = (query || {}) as any;
 
     const andConditions: PropertyWhereInput[] = [
-        { landlordId }
+        { landlordId },
+        { deletedAt: null },
+        { status: { not: PropertyStatus.ARCHIVED } }
     ];
 
     if (status) {

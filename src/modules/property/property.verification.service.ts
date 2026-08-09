@@ -14,8 +14,8 @@ const updatePropertyStatus = async (id: string, userId: string, role: string, pa
         if (payload.status !== PropertyStatus.INACTIVE) {
             throw new Error('Landlords can only set status to INACTIVE.');
         }
-        if (property.status !== PropertyStatus.VERIFIED) {
-            throw new Error('Property must be VERIFIED before setting it to INACTIVE.');
+        if (property.status !== PropertyStatus.ACTIVE) {
+            throw new Error('Property must be ACTIVE before setting it to INACTIVE.');
         }
     } else {
         property = await prisma.property.findUniqueOrThrow({
@@ -96,7 +96,7 @@ const verifyProperty = async (id: string) => {
     const result = await prisma.$transaction(async (tx) => {
         const updatedProperty = await tx.property.update({
             where: { id },
-            data: { status: PropertyStatus.VERIFIED },
+            data: { status: PropertyStatus.ACTIVE, isVerified: true },
             select: propertySelect
         });
 

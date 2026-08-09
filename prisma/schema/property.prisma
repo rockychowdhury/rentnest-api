@@ -8,6 +8,7 @@ model Property {
   description String
   status      PropertyStatus @default(DRAFT)
   isFeatured  Boolean        @default(false) @map("is_featured")
+  isVerified  Boolean        @default(false) @map("is_verified")
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @updatedAt @map("updated_at")
   deletedAt   DateTime?      @map("deleted_at")

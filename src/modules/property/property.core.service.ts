@@ -116,16 +116,55 @@ const deleteProperty = async (id: string, userId: string, role: string) => {
     return result;
 };
 
-const restoreProperty = async (id: string, userId: string, role: string) => {
+const makePropertyInactive = async (id: string, userId: string, role: string) => {
+    let property;
     if (role !== 'ADMIN') {
-        await prisma.property.findFirstOrThrow({ 
+        property = await prisma.property.findFirstOrThrow({ 
             where: { id, landlordId: userId } 
         });
+    } else {
+        property = await prisma.property.findUniqueOrThrow({
+            where: { id }
+        });
+    }
+
+    if (!property.isVerified) {
+        throw new Error('Property is not verified yet!!!');
+    }
+    if (property.status !== PropertyStatus.ACTIVE) {
+        throw new Error('Property is not active!!!');
     }
 
     const result = await prisma.property.update({
         where: { id },
-        data: { deletedAt: null },
+        data: { status: PropertyStatus.INACTIVE },
+        select: propertySelect
+    });
+    return result;
+};
+
+const restoreProperty = async (id: string, userId: string, role: string) => {
+    let property;
+    if (role !== 'ADMIN') {
+        property = await prisma.property.findFirstOrThrow({ 
+            where: { id, landlordId: userId } 
+        });
+    } else {
+        property = await prisma.property.findUniqueOrThrow({
+            where: { id }
+        });
+    }
+
+    if (!property.isVerified) {
+        throw new Error('Can not restore an unverified property!!!');
+    }
+    if (property.deletedAt !== null) {
+        throw new Error('Property does not exit or maybe already deleted!!!');
+    }
+
+    const result = await prisma.property.update({
+        where: { id },
+        data: { status: PropertyStatus.ACTIVE },
         select: propertySelect
     });
     return result;
@@ -136,5 +175,6 @@ export const propertyCoreService = {
     createProperty,
     updateProperty,
     deleteProperty,
+    makePropertyInactive,
     restoreProperty
 };

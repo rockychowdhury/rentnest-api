@@ -19,9 +19,9 @@ router.patch("/:propertyId", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRe
 router.patch("/:propertyId/status", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyValidation.updatePropertyStatusSchema), propertyController.updatePropertyStatus);
 router.patch("/:propertyId/amenities", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyValidation.setPropertyAmenitiesSchema), propertyController.setPropertyAmenities);
 router.delete("/:propertyId", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyValidation.getPropertyByIdSchema), propertyController.deleteProperty);
+router.patch("/:propertyId/inactive", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyValidation.getPropertyByIdSchema), propertyController.makePropertyInactive);
 router.post("/:propertyId/restore", auth(UserRole.LANDLORD, UserRole.ADMIN), validateRequest(PropertyValidation.getPropertyByIdSchema), propertyController.restoreProperty);
 router.post("/:propertyId/request-verification", auth(UserRole.LANDLORD), validateRequest(PropertyValidation.requestVerificationSchema), propertyController.requestVerification);
 router.patch("/:propertyId/verify", auth(UserRole.ADMIN), validateRequest(PropertyValidation.getPropertyByIdSchema), propertyController.verifyProperty);
 router.patch("/:propertyId/reject", auth(UserRole.ADMIN), validateRequest(PropertyValidation.getPropertyByIdSchema), propertyController.rejectProperty);
-
 export const propertyRoutes = router;

@@ -19,7 +19,7 @@ enum Gender {
 enum PropertyStatus {
   DRAFT
   PENDING_VERIFICATION
-  VERIFIED
+  ACTIVE
   REJECTED
   INACTIVE
   ARCHIVED

@@ -8,6 +8,7 @@ export const propertySelect: PropertySelect = {
     landlordId: true,
     status: true,
     isFeatured: true,
+    isVerified: true,
     createdAt: true,
     deletedAt: true,
     landlord: {
@@ -101,6 +102,7 @@ export const publicPropertySelect = {
     id: true,
     slug: true,
     title: true,
+    isVerified: true,
     images: {
         where: { isCover: true },
         take: 1,
