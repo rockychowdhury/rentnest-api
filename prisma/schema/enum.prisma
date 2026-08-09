@@ -73,3 +73,9 @@ enum Currency {
   BDT
   USD
 }
+
+enum AmenityType {
+  PROPERTY
+  UNIT
+  COMMON
+}

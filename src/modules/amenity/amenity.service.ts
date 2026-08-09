@@ -8,6 +8,7 @@ const amenitySelect: AmenitySelect = {
     id: true,
     name: true,
     description: true,
+    type: true,
     createdAt: true,
 };
 
@@ -20,8 +21,14 @@ const createAmenity = async (payload: IAmenityCreatePayload) => {
 
 const getAllAmenities = async (query: IQuery) => {
     const { searchTerm, page, limit, skip, take, orderBy } = calculatePagination(query);
+    const { type } = query as any;
 
     const whereConditions: AmenityWhereInput = {};
+
+    if (type) {
+        const typesArray = type.split(',').map((t: string) => t.trim());
+        whereConditions.type = { in: typesArray };
+    }
 
     if (searchTerm) {
         whereConditions.OR = [
