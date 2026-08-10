@@ -65,7 +65,7 @@ const getAllPropertiesSchema = z.object({
     categoryId: z.string().uuid().optional(),
     amenities: z.string().optional(),
     status: z.nativeEnum(PropertyStatus).optional(),
-    isFeatured: z.boolean().optional(),
+    isFeatured: z.preprocess((val) => val === 'true' || val === '1' || val === true, z.boolean()).optional(),
     timeFilter: z.enum(['today', 'this-month']).optional(),
     bedrooms: z.string().optional(),
     bathrooms: z.string().optional(),

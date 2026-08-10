@@ -4,7 +4,7 @@ export const calculatePagination = (query?: IQuery) => {
     const searchTerm = query?.searchTerm || "";
     
     const page = query?.page ? parseInt(query.page) : 1;
-    const limit = query?.limit ? parseInt(query.limit) : 20;
+    const limit = query?.limit ? Math.min(parseInt(query.limit), 20) : 20;
     const skip = (page - 1) * limit;
 
     const sortBy = query?.sortBy || 'createdAt';
