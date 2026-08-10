@@ -2,6 +2,7 @@ import { PropertySelect } from "../../../generated/prisma/models";
 
 export const propertySelect: PropertySelect = {
     id: true,
+    slug:true,
     title: true,
     description: true,
     categoryId: true,
@@ -149,6 +150,7 @@ export const publicPropertySelect = {
             bedrooms: true,
             bathrooms: true,
             sizeSqft: true,
+            status: true,
             pricing: {
                 where: { isActive: true },
                 select: {

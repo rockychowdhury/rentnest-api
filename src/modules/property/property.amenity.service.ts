@@ -23,7 +23,7 @@ const setPropertyAmenities = async (id: string, userId: string, role: string, pa
             });
         }
 
-        return tx.property.findUnique({
+        return await tx.property.findUnique({
             where: { id },
             select: propertySelect
         });
