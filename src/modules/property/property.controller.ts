@@ -38,6 +38,105 @@ const getFeaturedProperties = catchAsync(async (req: Request, res: Response) => 
     });
 });
 
+const getBudgetFriendlyProperties = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyQueryService.getBudgetFriendlyProperties(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Budget friendly properties retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
+const getLuxuryProperties = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyQueryService.getLuxuryProperties(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Luxury properties retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
+const getQuickAvailableProperties = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyQueryService.getQuickAvailableProperties(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Quick available properties retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
+const getNewThisMonthProperties = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyQueryService.getNewThisMonthProperties(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "New this month properties retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
+const getBachelorMessProperties = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyQueryService.getBachelorMessProperties(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Bachelor mess properties retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
+const getApartmentProperties = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyQueryService.getApartmentProperties(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Apartment/Flat properties retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
+const getDhakaProperties = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyQueryService.getDhakaProperties(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Dhaka properties retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
+const getFlexibleRentProperties = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyQueryService.getFlexibleRentProperties(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Flexible rent properties retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
+const getPopularProperties = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyQueryService.getPopularProperties(req.query);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "Popular properties retrieved successfully",
+        data: result.data,
+        meta: result.meta
+    });
+});
+
 const getLandlordProperties = catchAsync(async (req: Request, res: Response) => {
     const { landlordId } = req.params;
     const result = await propertyQueryService.getLandlordProperties(landlordId as string, req.query);
@@ -215,6 +314,15 @@ export const propertyController = {
     getAllProperties,
     getAllPropertiesAdmin,
     getFeaturedProperties,
+    getBudgetFriendlyProperties,
+    getLuxuryProperties,
+    getQuickAvailableProperties,
+    getNewThisMonthProperties,
+    getBachelorMessProperties,
+    getApartmentProperties,
+    getDhakaProperties,
+    getFlexibleRentProperties,
+    getPopularProperties,
     getLandlordProperties,
     getMyProperties,
     getPropertyById,
