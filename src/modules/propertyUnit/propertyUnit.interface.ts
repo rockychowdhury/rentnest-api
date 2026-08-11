@@ -5,6 +5,7 @@ export interface IPropertyUnitCreatePayload {
     bedrooms: number;
     bathrooms: number;
     sizeSqft: number;
+    availableFrom?: Date | string;
 }
 
 export interface IPropertyUnitUpdatePayload {
@@ -12,6 +13,7 @@ export interface IPropertyUnitUpdatePayload {
     bedrooms?: number;
     bathrooms?: number;
     sizeSqft?: number;
+    availableFrom?: Date | string | null;
 }
 
 export interface IPropertyUnitStatusUpdatePayload {

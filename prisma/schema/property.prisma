@@ -9,6 +9,7 @@ model Property {
   status      PropertyStatus @default(DRAFT)
   isFeatured  Boolean        @default(false) @map("is_featured")
   isVerified  Boolean        @default(false) @map("is_verified")
+  rating      Float          @default(0)
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @updatedAt @map("updated_at")
   deletedAt   DateTime?      @map("deleted_at")
@@ -31,18 +32,19 @@ model Property {
 }
 
 model PropertyUnit {
-  id          String             @id @default(uuid()) @db.Uuid
-  propertyId  String             @map("property_id") @db.Uuid
-  unitLabel   String             @map("unit_label") @db.VarChar(255)
-  status      PropertyUnitStatus @default(AVAILABLE)
-  sizeSqft    Int?               @map("size_sqft")
-  bedrooms    Int                @default(0) @db.SmallInt
-  bathrooms   Int                @default(0) @db.SmallInt
-  floor       Int?               @db.SmallInt
-  description String?
-  createdAt   DateTime           @default(now()) @map("created_at")
-  updatedAt   DateTime           @updatedAt @map("updated_at")
-  deletedAt   DateTime?          @map("deleted_at")
+  id            String             @id @default(uuid()) @db.Uuid
+  propertyId    String             @map("property_id") @db.Uuid
+  unitLabel     String             @map("unit_label") @db.VarChar(255)
+  status        PropertyUnitStatus @default(AVAILABLE)
+  sizeSqft      Int?               @map("size_sqft")
+  bedrooms      Int                @default(0) @db.SmallInt
+  bathrooms     Int                @default(0) @db.SmallInt
+  floor         Int?               @db.SmallInt
+  description   String?
+  availableFrom DateTime?          @default(now()) @map("available_from") @db.Date
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+  deletedAt     DateTime?          @map("deleted_at")
 
   property       Property              @relation(fields: [propertyId], references: [id])
   pricing        Pricing[]

@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { PropertyUnitStatus } from '../../../generated/prisma/enums';
 import { uuidParamSchema, paginationQuerySchema } from '../../middleware/shared.validation';
 
+const dateString = z.string().refine((date) => !isNaN(Date.parse(date)), { message: "Invalid date string" });
+
 const createPropertyUnitSchema = z.object({
   params: z.object({
     propertyId: z.string().uuid("Invalid Property ID in URL"),
@@ -14,6 +16,7 @@ const createPropertyUnitSchema = z.object({
     bathrooms: z.number().int().min(0).optional(),
     floor: z.number().int().optional(),
     description: z.string().optional(),
+    availableFrom: dateString.optional(),
   }),
 });
 
@@ -28,6 +31,7 @@ const updatePropertyUnitSchema = z.object({
     bathrooms: z.number().int().min(0).optional(),
     floor: z.number().int().optional(),
     description: z.string().optional(),
+    availableFrom: dateString.nullable().optional(),
   }),
 });
 

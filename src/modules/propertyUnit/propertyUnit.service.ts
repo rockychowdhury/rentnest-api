@@ -15,6 +15,7 @@ const unitSelect: PropertyUnitSelect = {
     floor: true,
     description: true,
     status: true,
+    availableFrom: true,
     createdAt: true,
     updatedAt: true,
     pricing: {
@@ -74,12 +75,15 @@ const createPropertyUnit = async (propertyId: string, landlordId: string, payloa
         where: { id: propertyId, landlordId }
     });
 
+    const { availableFrom, ...unitData } = payload;
+    const data: any = { propertyId, ...unitData };
+    if (availableFrom !== undefined) {
+        data.availableFrom = new Date(availableFrom);
+    }
+
     const result = await prisma.$transaction(async (tx) => {
         const unit = await tx.propertyUnit.create({
-            data: {
-                propertyId,
-                ...payload
-            },
+            data,
             select: unitSelect
         });
 
@@ -96,9 +100,15 @@ const updatePropertyUnit = async (id: string, landlordId: string, role: string, 
         });
     }
 
+    const { availableFrom, ...unitData } = payload;
+    const data: any = { ...unitData };
+    if (availableFrom !== undefined) {
+        data.availableFrom = availableFrom === null ? null : new Date(availableFrom);
+    }
+
     const result = await prisma.propertyUnit.update({
         where: { id },
-        data: payload,
+        data,
         select: unitSelect
     });
     return result;
@@ -111,9 +121,16 @@ const updatePropertyUnitStatus = async (id: string, landlordId: string, role: st
         });
     }
 
+    const data: any = { status: payload.status };
+    if (payload.status === PropertyUnitStatus.AVAILABLE) {
+        data.availableFrom = new Date();
+    } else if (payload.status === PropertyUnitStatus.OCCUPIED || payload.status === PropertyUnitStatus.MAINTENANCE) {
+        data.availableFrom = null;
+    }
+
     const result = await prisma.propertyUnit.update({
         where: { id },
-        data: { status: payload.status },
+        data,
         select: unitSelect
     });
     return result;
@@ -150,6 +167,7 @@ const getPropertyUnitAvailability = async (id: string) => {
         select: {
             id: true,
             status: true,
+            availableFrom: true,
         }
     });
 
@@ -158,6 +176,7 @@ const getPropertyUnitAvailability = async (id: string) => {
     return {
         isAvailable,
         currentStatus: unit.status,
+        availableFrom: unit.availableFrom,
     };
 };
 

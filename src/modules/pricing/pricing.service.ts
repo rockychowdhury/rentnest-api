@@ -8,6 +8,8 @@ const pricingSelect: PricingSelect = {
     rentType: true,
     rentAmount: true,
     securityDeposit: true,
+    utilityBill: true,
+    utilityPolicy: true,
     currency: true,
     isActive: true,
     createdAt: true,

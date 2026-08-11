@@ -5,8 +5,20 @@ import { PropertyStatus, PropertyUnitStatus } from "../../../generated/prisma/en
 import { PricingWhereInput, PropertyUnitWhereInput, PropertyWhereInput } from "../../../generated/prisma/models";
 import { propertySelect, publicPropertySelect, formatPublicProperty } from "./property.constants";
 
+const buildPropertyOrderBy = (sortBy: string, sortOrder: string): any => {
+    if (sortBy === 'popular') {
+        return [
+            { reviews: { _count: sortOrder } },
+            { rating: sortOrder },
+            { createdAt: sortOrder }
+        ];
+    }
+    return { [sortBy]: sortOrder };
+};
+
 const getAllProperties = async (query: IQuery) => {
-    const { searchTerm, page, limit, skip, take, orderBy } = calculatePagination(query);
+    const { searchTerm, page, limit, skip, take, sortBy, sortOrder } = calculatePagination(query);
+    const orderBy = buildPropertyOrderBy(sortBy, sortOrder);
     const { categoryId, minPrice, maxPrice, amenities, isFeatured, bedrooms, bathrooms, rentType, timeFilter, areaId, districtId, divisionId } = query as any;
 
     const andConditions: PropertyWhereInput[] = [
@@ -130,7 +142,8 @@ const getAllProperties = async (query: IQuery) => {
 };
 
 const getAllPropertiesAdmin = async (query: IQuery) => {
-    const { searchTerm, page, limit, skip, take, orderBy } = calculatePagination(query);
+    const { searchTerm, page, limit, skip, take, sortBy, sortOrder } = calculatePagination(query);
+    const orderBy = buildPropertyOrderBy(sortBy, sortOrder);
     const { status, categoryId } = (query || {}) as any;
 
     const andConditions: PropertyWhereInput[] = [];
@@ -184,7 +197,8 @@ const getFeaturedProperties = async () => {
 };
 
 const getLandlordProperties = async (landlordId: string, query: IQuery) => {
-    const { page, limit, skip, take, orderBy } = calculatePagination(query);
+    const { page, limit, skip, take, sortBy, sortOrder } = calculatePagination(query);
+    const orderBy = buildPropertyOrderBy(sortBy, sortOrder);
 
     const [data, total] = await Promise.all([
         prisma.property.findMany({
@@ -206,7 +220,8 @@ const getLandlordProperties = async (landlordId: string, query: IQuery) => {
 };
 
 const getMyProperties = async (landlordId: string, query: IQuery) => {
-    const { searchTerm, page, limit, skip, take, orderBy } = calculatePagination(query);
+    const { searchTerm, page, limit, skip, take, sortBy, sortOrder } = calculatePagination(query);
+    const orderBy = buildPropertyOrderBy(sortBy, sortOrder);
     const { status, categoryId } = (query || {}) as any;
 
     const andConditions: PropertyWhereInput[] = [

@@ -25,6 +25,7 @@ const getPropertyById = async (id: string) => {
                     floor: true,
                     description: true,
                     status: true,
+                    availableFrom: true,
                     pricing: {
                         select: { rentAmount: true, securityDeposit: true }
                     }

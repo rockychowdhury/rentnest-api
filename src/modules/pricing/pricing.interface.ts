@@ -4,6 +4,8 @@ export interface IPricingCreatePayload {
     rentType: RentType;
     rentAmount: number;
     securityDeposit?: number;
+    utilityBill?: number;
+    utilityPolicy?: string;
     currency?: Currency;
     isActive?: boolean;
 }
@@ -12,6 +14,8 @@ export interface IPricingUpdatePayload {
     rentType?: RentType;
     rentAmount?: number;
     securityDeposit?: number;
+    utilityBill?: number;
+    utilityPolicy?: string;
     currency?: Currency;
     isActive?: boolean;
 }

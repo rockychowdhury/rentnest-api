@@ -206,7 +206,7 @@ const respondToRentalRequest = async (id: string, landlordId: string, payload: I
 
             await tx.propertyUnit.update({
                 where: { id: rentReq.propertyUnitId },
-                data: { status: PropertyUnitStatus.OCCUPIED }
+                data: { status: PropertyUnitStatus.OCCUPIED, availableFrom: null }
             });
         }
 

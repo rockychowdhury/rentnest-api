@@ -24,7 +24,8 @@
     "seed:geo": "tsx scripts/seed-geo.ts",
     "seed:categories": "tsx scripts/seed-categories.ts",
     "seed:amenities": "tsx scripts/seed-amenities.ts",
-    "seed:all": "npm run seed:geo && npm run seed:categories && npm run seed:amenities",
+    "seed:properties": "tsx scripts/seed-properties.ts",
+    "seed:all": "npm run seed:geo && npm run seed:categories && npm run seed:amenities && npm run seed:properties",
     "postinstall": "prisma generate"
   },
   "devDependencies": {

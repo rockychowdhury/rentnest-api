@@ -140,7 +140,10 @@ const updateLeaseStatus = async (id: string, userId: string, role: string, paylo
         if (payload.status === LeaseStatus.TERMINATED || payload.status === LeaseStatus.COMPLETED) {
             await tx.propertyUnit.update({
                 where: { id: lease.propertyUnitId },
-                data: { status: PropertyUnitStatus.AVAILABLE}
+                data: {
+                    status: PropertyUnitStatus.AVAILABLE,
+                    availableFrom: lease.endDate ?? new Date()
+                }
             });
         }
         return lease;

@@ -10,6 +10,8 @@ const createPricingSchema = z.object({
     rentType: z.nativeEnum(RentType),
     rentAmount: z.number().positive('Rent amount must be a positive number'),
     securityDeposit: z.number().min(0).optional(),
+    utilityBill: z.number().min(0).optional(),
+    utilityPolicy: z.string().max(255).optional(),
     currency: z.nativeEnum(Currency).optional(),
     isActive: z.boolean().optional(),
   }),
@@ -22,6 +24,8 @@ const updatePricingSchema = z.object({
   body: z.object({
     rentAmount: z.number().positive().optional(),
     securityDeposit: z.number().min(0).optional(),
+    utilityBill: z.number().min(0).optional(),
+    utilityPolicy: z.string().max(255).optional(),
     isActive: z.boolean().optional(),
   }),
 });

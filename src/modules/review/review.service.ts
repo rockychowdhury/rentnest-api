@@ -5,6 +5,18 @@ import { ReviewSelect } from "../../../generated/prisma/models";
 import { IReviewCreatePayload, IReviewRespondPayload, IReviewUpdatePayload } from "./review.interface";
 import { LeaseStatus } from "../../../generated/prisma/enums";
 
+const refreshPropertyRating = async (propertyId: string, client: any = prisma) => {
+    const agg = await client.review.aggregate({
+        where: { propertyId },
+        _avg: { rating: true }
+    });
+    const rating = agg._avg.rating ?? 0;
+    await client.property.update({
+        where: { id: propertyId },
+        data: { rating: Math.round(rating * 10) / 10 }
+    });
+};
+
 const reviewSelect: ReviewSelect = {
     id: true,
     propertyId: true,
@@ -147,12 +159,18 @@ const createReview = async (tenantId: string, payload: IReviewCreatePayload) => 
         }
     }
 
-    const result = await prisma.review.create({
-        data: {
-            tenantId,
-            ...payload
-        },
-        select: reviewSelect
+    const result = await prisma.$transaction(async (tx) => {
+        const review = await tx.review.create({
+            data: {
+                tenantId,
+                ...payload
+            },
+            select: reviewSelect
+        });
+
+        await refreshPropertyRating(payload.propertyId, tx);
+
+        return review;
     });
     return result;
 };
@@ -167,6 +185,9 @@ const updateReview = async (id: string, tenantId: string, payload: IReviewUpdate
         data: payload,
         select: reviewSelect
     });
+
+    await refreshPropertyRating(result.propertyId);
+
     return result;
 };
 
@@ -181,6 +202,9 @@ const deleteReview = async (id: string, userId: string, role: string) => {
         where: { id },
         select: reviewSelect
     });
+
+    await refreshPropertyRating(result.propertyId);
+
     return result;
 };
 

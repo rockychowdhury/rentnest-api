@@ -10,6 +10,12 @@ export const propertySelect: PropertySelect = {
     status: true,
     isFeatured: true,
     isVerified: true,
+    rating: true,
+    _count: {
+        select: {
+            reviews: true
+        }
+    },
     createdAt: true,
     deletedAt: true,
     landlord: {
@@ -83,6 +89,7 @@ export const propertySelect: PropertySelect = {
             id: true,
             unitLabel: true,
             status: true,
+            availableFrom: true,
             bedrooms: true,
             bathrooms: true,
             sizeSqft: true,
@@ -104,6 +111,12 @@ export const publicPropertySelect = {
     slug: true,
     title: true,
     isVerified: true,
+    rating: true,
+    _count: {
+        select: {
+            reviews: true
+        }
+    },
     images: {
         where: { isCover: true },
         take: 1,
@@ -151,6 +164,7 @@ export const publicPropertySelect = {
             bathrooms: true,
             sizeSqft: true,
             status: true,
+            availableFrom: true,
             pricing: {
                 where: { isActive: true },
                 select: {
@@ -224,6 +238,7 @@ export const formatPublicProperty = (property: any, query?: any) => {
                 beds: u.bedrooms,
                 bath: u.bathrooms,
                 size: u.sizeSqft,
+                availableFrom: u.availableFrom,
                 pricing: u.pricing[0] 
             });
 
@@ -239,6 +254,8 @@ export const formatPublicProperty = (property: any, query?: any) => {
         slug: property.slug,
         title: property.title,
         image: property.images?.[0] || null,
+        rating: property.rating ?? 0,
+        reviewCount: property._count?.reviews ?? 0,
         address: {
             id: property.address?.id,
             streetAddress: property.address?.streetAddress,
