@@ -15,9 +15,8 @@ router.get("/budget-friendly", validateRequest(PropertyValidation.getAllProperti
 router.get("/luxury", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getLuxuryProperties);
 router.get("/quick-available", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getQuickAvailableProperties);
 router.get("/new-this-month", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getNewThisMonthProperties);
-router.get("/bachelors", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getBachelorMessProperties);
-router.get("/apartments", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getApartmentProperties);
-router.get("/dhaka", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getDhakaProperties);
+router.get("/category/:categoryId", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getPropertiesByCategory);
+router.get("/near", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getPropertiesNear);
 router.get("/flexible-rent", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getFlexibleRentProperties);
 router.get("/popular", validateRequest(PropertyValidation.getAllPropertiesSchema), propertyController.getPopularProperties);
 router.get("/landlord/:landlordId", validateRequest(PropertyValidation.getLandlordPropertiesSchema), propertyController.getLandlordProperties);

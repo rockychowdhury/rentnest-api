@@ -29,7 +29,7 @@ const getAllPropertiesAdmin = catchAsync(async (req: Request, res: Response) => 
 });
 
 const getFeaturedProperties = catchAsync(async (req: Request, res: Response) => {
-    const result = await propertyQueryService.getFeaturedProperties();
+    const result = await propertyQueryService.getFeaturedProperties(req.query);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -82,34 +82,24 @@ const getNewThisMonthProperties = catchAsync(async (req: Request, res: Response)
     });
 });
 
-const getBachelorMessProperties = catchAsync(async (req: Request, res: Response) => {
-    const result = await propertyQueryService.getBachelorMessProperties(req.query);
+const getPropertiesByCategory = catchAsync(async (req: Request, res: Response) => {
+    const { categoryId } = req.params;
+    const result = await propertyQueryService.getPropertiesByCategory(categoryId as string, req.query);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: "Bachelor mess properties retrieved successfully",
+        message: "Category properties retrieved successfully",
         data: result.data,
         meta: result.meta
     });
 });
 
-const getApartmentProperties = catchAsync(async (req: Request, res: Response) => {
-    const result = await propertyQueryService.getApartmentProperties(req.query);
+const getPropertiesNear = catchAsync(async (req: Request, res: Response) => {
+    const result = await propertyQueryService.getAllProperties(req.query);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: "Apartment/Flat properties retrieved successfully",
-        data: result.data,
-        meta: result.meta
-    });
-});
-
-const getDhakaProperties = catchAsync(async (req: Request, res: Response) => {
-    const result = await propertyQueryService.getDhakaProperties(req.query);
-    sendResponse(res, {
-        statusCode: status.OK,
-        success: true,
-        message: "Dhaka properties retrieved successfully",
+        message: "Properties near location retrieved successfully",
         data: result.data,
         meta: result.meta
     });
@@ -318,9 +308,8 @@ export const propertyController = {
     getLuxuryProperties,
     getQuickAvailableProperties,
     getNewThisMonthProperties,
-    getBachelorMessProperties,
-    getApartmentProperties,
-    getDhakaProperties,
+    getPropertiesByCategory,
+    getPropertiesNear,
     getFlexibleRentProperties,
     getPopularProperties,
     getLandlordProperties,

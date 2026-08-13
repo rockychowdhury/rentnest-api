@@ -171,7 +171,17 @@ const resolveDistrictIdByName = async (name: string): Promise<number | null> => 
     return district?.id ?? null;
 };
 
-const getAllProperties = async (query: IQuery) => {
+const getAllProperties = async (query: any) => {
+    if (query.sortBy === 'rentAmount') {
+        return getPropertiesSortedByMinRent(query, query.sortOrder === 'desc' ? 'desc' : 'asc');
+    }
+    if (query.quickAvailable === 'true' || query.quickAvailable === true) {
+        return getQuickAvailableProperties(query);
+    }
+    if (query.flexibleRent === 'true' || query.flexibleRent === true) {
+        return getFlexibleRentProperties(query);
+    }
+
     const { page, limit, skip, take, sortBy, sortOrder } = calculatePagination(query);
     const orderBy = buildPropertyOrderBy(sortBy, sortOrder);
     const whereConditions = buildPublicPropertyWhere(query);
@@ -242,15 +252,15 @@ const getAllPropertiesAdmin = async (query: IQuery) => {
     };
 };
 
-const getFeaturedProperties = async () => {
-    const where = buildPublicPropertyWhere({ isFeatured: true });
+const getFeaturedProperties = async (query: IQuery = {}) => {
+    const where = buildPublicPropertyWhere({ ...query, isFeatured: true });
     const result = await prisma.property.findMany({
         where,
         take: 10,
         select: publicPropertySelect,
         orderBy: { createdAt: 'desc' }
     });
-    return result.map(p => formatPublicProperty(p)).filter((p): p is NonNullable<typeof p> => p !== null);
+    return result.map(p => formatPublicProperty(p, query)).filter((p): p is NonNullable<typeof p> => p !== null);
 };
 
 /**
@@ -357,12 +367,12 @@ const getLuxuryProperties = async (query: IQuery) => {
 
 /**
  * Quick available: properties whose AVAILABLE unit becomes available within
- * the next 7 days (unit.availableFrom <= now + 7 days).
+ * the next 10 days (unit.availableFrom <= now + 10 days).
  */
 const getQuickAvailableProperties = async (query: IQuery) => {
-    const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    const where = buildPublicPropertyWhere(query, { availableFrom: { lte: sevenDaysFromNow } });
-    return listPublicProperties(query, { where });
+    const tenDaysFromNow = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
+    const where = buildPublicPropertyWhere(query, { availableFrom: { lte: tenDaysFromNow } });
+    return listPublicProperties(query, { where, orderBy: { createdAt: 'asc' } });
 };
 
 /**
@@ -373,30 +383,10 @@ const getNewThisMonthProperties = async (query: IQuery) => {
 };
 
 /**
- * Bachelor mess listings: category "Bachelor Mess", highest rent first.
+ * Properties by Category: returns properties belonging to a specific category.
  */
-const getBachelorMessProperties = async (query: IQuery) => {
-    const categoryId = (query as any).categoryId ?? (await resolveCategoryIdByName('Bachelor Mess'));
-    if (!categoryId) return emptyResult(query);
-    return getPropertiesSortedByMinRent({ ...query, categoryId }, 'desc');
-};
-
-/**
- * Apartment/Flat listings: category "Apartment/Flat", lowest rent first.
- */
-const getApartmentProperties = async (query: IQuery) => {
-    const categoryId = (query as any).categoryId ?? (await resolveCategoryIdByName('Apartment/Flat'));
-    if (!categoryId) return emptyResult(query);
-    return getPropertiesSortedByMinRent({ ...query, categoryId }, 'asc');
-};
-
-/**
- * Rental properties in Dhaka: district resolved by name, then filtered.
- */
-const getDhakaProperties = async (query: IQuery) => {
-    const districtId = await resolveDistrictIdByName('Dhaka');
-    if (!districtId) return emptyResult(query);
-    return listPublicProperties({ ...query, districtId: String(districtId) });
+const getPropertiesByCategory = async (categoryId: string, query: IQuery) => {
+    return listPublicProperties({ ...query, categoryId });
 };
 
 /**
@@ -527,9 +517,7 @@ export const propertyQueryService = {
     getLuxuryProperties,
     getQuickAvailableProperties,
     getNewThisMonthProperties,
-    getBachelorMessProperties,
-    getApartmentProperties,
-    getDhakaProperties,
+    getPropertiesByCategory,
     getFlexibleRentProperties,
     getPopularProperties,
     getLandlordProperties,
