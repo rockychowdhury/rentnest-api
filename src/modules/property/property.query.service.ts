@@ -370,8 +370,14 @@ const getLuxuryProperties = async (query: IQuery) => {
  * the next 10 days (unit.availableFrom <= now + 10 days).
  */
 const getQuickAvailableProperties = async (query: IQuery) => {
-    const tenDaysFromNow = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
-    const where = buildPublicPropertyWhere(query, { availableFrom: { lte: tenDaysFromNow } });
+    const now = new Date();
+    const tenDaysFromNow = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
+    const where = buildPublicPropertyWhere(query, { 
+        availableFrom: { 
+            gte: now, 
+            lte: tenDaysFromNow 
+        } 
+    });
     return listPublicProperties(query, { where, orderBy: { createdAt: 'asc' } });
 };
 
