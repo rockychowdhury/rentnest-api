@@ -38,12 +38,12 @@ const login = async (payload: ILoginPayload) => {
     const accessToken = jwtUtils.createToken(
         jwtPayload,
         config.jwt_access_secret,
-        config.jwt_access_expires_in as SignOptions
+        config.jwt_access_expires_in as string
     );
     const refreshToken = jwtUtils.createToken(
         jwtPayload,
         config.jwt_refresh_secret,
-        config.jwt_refresh_expires_in as SignOptions
+        config.jwt_refresh_expires_in as string
     );
 
     return { accessToken, refreshToken };
@@ -70,7 +70,7 @@ const tokenRefresh = async (refreshToken: string) => {
         role: user.role,
     }
 
-    const accessToken = jwtUtils.createToken(jwtPayload, config.jwt_access_secret, config.jwt_access_expires_in as SignOptions)
+    const accessToken = jwtUtils.createToken(jwtPayload, config.jwt_access_secret, config.jwt_access_expires_in as string)
 
     return { accessToken };
 }
